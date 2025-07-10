@@ -214,14 +214,14 @@ export default function HomePage() {
                 )}
 
                 {/* Hero Section */}
-                <div className="relative z-10 pt-20">
-                    <div className="container mx-auto max-w-7xl px-4">
+                <div className="relative z-10 pt-12 sm:pt-16 md:pt-20">
+                    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         
                         {/* Main Title */}
-                        <div className="text-center mb-16">
-                            <div className="flex items-center justify-center mb-6">
+                        <div className="text-center mb-8 md:mb-16">
+                            <div className="flex flex-col sm:flex-row items-center justify-center mb-4 md:mb-6">
                                 <svg 
-                                    className="w-16 h-16 mr-4" 
+                                    className="w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-0 sm:mr-4" 
                                     viewBox="0 0 24 24" 
                                     fill="none" 
                                     xmlns="http://www.w3.org/2000/svg"
@@ -230,18 +230,18 @@ export default function HomePage() {
                                     <path d="M8 12l4-4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     <path d="M12 8v8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                                 </svg>
-                                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
+                                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
                                     Background Remover
                                 </h1>
                             </div>
                             
-                            <p className="text-xl text-gray-600 dark:text-gray-300 mb-16 max-w-2xl mx-auto">
+                            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 md:mb-16 max-w-2xl mx-auto px-4 sm:px-0">
                                 Erase image backgrounds for free and replace it with different backgrounds of your choosing.
                             </p>
                         </div>
 
                         {/* Main Content Area */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start mb-16">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start mb-8 md:mb-16">
                             
                             {/* Left Image */}
                             <div className="hidden lg:flex justify-center">
@@ -258,7 +258,7 @@ export default function HomePage() {
                             </div>
 
                             {/* Upload Area */}
-                            <div className="flex flex-col items-center">
+                            <div className="flex flex-col items-center px-4 sm:px-0">
                                 <div 
                                     {...getRootProps()}
                                     ref={dropzoneRef}
@@ -273,7 +273,7 @@ export default function HomePage() {
                                     
                                     {/* Main Upload Container */}
                                     <div className={cn(
-                                        "relative h-96 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 overflow-hidden",
+                                        "relative h-80 sm:h-96 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 overflow-hidden",
                                         "border-2 border-dashed",
                                         isDragActive 
                                             ? currentTheme === 'light'
@@ -294,11 +294,11 @@ export default function HomePage() {
                                         </div>
                                         
                                         {/* Content */}
-                                        <div className="relative z-10 flex flex-col items-center justify-center space-y-6">
+                                        <div className="relative z-10 flex flex-col items-center justify-center space-y-4 sm:space-y-6 px-4">
                                             
                                             {/* Upload Icon */}
                                             <div className={cn(
-                                                "relative p-6 rounded-2xl shadow-lg",
+                                                "relative p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg",
                                                 currentTheme === 'light'
                                                     ? "bg-gray-900"
                                                     : "bg-white"
@@ -324,7 +324,7 @@ export default function HomePage() {
                                             {/* Main Text */}
                                             <div className="text-center space-y-2">
                                                 <h3 className={cn(
-                                                    "text-2xl font-bold",
+                                                    "text-xl sm:text-2xl font-bold",
                                                     currentTheme === 'light' ? 'text-gray-900' : 'text-white'
                                                 )}>
                                                     {isDragActive ? 'Drop your image here' : 'Upload Your Image'}
@@ -343,12 +343,12 @@ export default function HomePage() {
                                             {/* Upload Button */}
                                             <div className="cursor-pointer">
                                                 <span className={cn(
-                                                    "inline-flex items-center justify-center px-8 py-4 font-semibold rounded-2xl transition-all duration-300 shadow-lg",
+                                                    "inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 font-semibold rounded-xl sm:rounded-2xl transition-all duration-300 shadow-lg text-sm sm:text-base",
                                                     currentTheme === 'light'
                                                         ? "bg-gray-900 hover:bg-gray-800 text-white"
                                                         : "bg-white hover:bg-gray-100 text-gray-900"
                                                 )}>
-                                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                                     </svg>
                                                     Choose Image
@@ -361,7 +361,7 @@ export default function HomePage() {
                                                     <span 
                                                         key={format}
                                                         className={cn(
-                                                            "px-3 py-1 text-xs font-medium rounded-full",
+                                                            "px-2 sm:px-3 py-1 text-xs font-medium rounded-full",
                                                             currentTheme === 'light'
                                                                 ? "bg-gray-100 text-gray-600"
                                                                 : "bg-gray-700 text-gray-300"
@@ -378,7 +378,7 @@ export default function HomePage() {
                                 {/* No image section */}
                                 <div className="mt-4 text-center">
                                     <p className={cn(
-                                        "text-base font-medium mb-3",
+                                        "text-sm sm:text-base font-medium mb-3",
                                         currentTheme === 'light' ? 'text-gray-700' : 'text-gray-300'
                                     )}>
                                         <span className="font-bold">No image?</span> Try one of these samples
@@ -397,7 +397,7 @@ export default function HomePage() {
                                                         });
                                                 }}
                                                 className={cn(
-                                                    "relative w-14 h-12 rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-md hover:scale-105",
+                                                    "relative w-12 h-10 sm:w-14 sm:h-12 rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-md hover:scale-105",
                                                     currentTheme === 'light'
                                                         ? "border-gray-200 hover:border-gray-300"
                                                         : "border-gray-600 hover:border-gray-500"
@@ -416,7 +416,7 @@ export default function HomePage() {
                                     </div>
                                     
                                     {/* Privacy Policy Footer */}
-                                    <div className="mt-4 text-xs text-gray-500 max-w-md mx-auto">
+                                    <div className="mt-4 text-xs text-gray-500 max-w-md mx-auto px-4 sm:px-0">
                                         <p className="leading-relaxed">
                                             By uploading an image you agree to our{' '}
                                             <Link href="/terms" className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors duration-200">
