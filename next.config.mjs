@@ -1,59 +1,49 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Get __dirname equivalent in ES modules
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false,
-    trailingSlash: true,
-    distDir: 'dist',
-    images: {
-        unoptimized: true,
-        domains: ['localhost'],
-        remotePatterns: [
-            {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '3000',
-                pathname: '/**',
-            },
-        ],
-    },
-    webpack: (config, { isServer }) => {
-        config.resolve = {
-            ...config.resolve,
-            alias: {
-                ...config.resolve.alias,
-                "sharp$": false,
-                "onnxruntime-node$": false,
-            },
-            fallback: {
-                "fs": false,
-                "path": false,
-                "crypto": false
-            }
-        };
+  reactStrictMode: true,
+  trailingSlash: false, // or keep true if you're sure
+  images: {
+    unoptimized: true,
+    domains: ['your-vercel-domain.vercel.app'], // UPDATE this!
+  },
+  webpack: (config) => {
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve.alias,
+        sharp$: false,
+        'onnxruntime-node$': false,
+      },
+      fallback: {
+        fs: false,
+        path: false,
+        crypto: false,
+      },
+    };
 
-        config.module.rules.push({
-            test: /\.m?js$/,
-            type: "javascript/auto",
-            resolve: {
-                fullySpecified: false
-            }
-        });
+    config.module.rules.push({
+      test: /\.m?js$/,
+      type: 'javascript/auto',
+      resolve: {
+        fullySpecified: false,
+      },
+    });
 
-        config.experiments = {
-            asyncWebAssembly: true,
-            layers: true,
-            topLevelAwait: true,
-            syncWebAssembly: true
-        };
+    config.experiments = {
+      asyncWebAssembly: true,
+      layers: true,
+      topLevelAwait: true,
+      syncWebAssembly: true,
+    };
 
-        return config;
-    }
+    return config;
+  },
 };
 
 export default nextConfig;
