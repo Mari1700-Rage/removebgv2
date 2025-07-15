@@ -70,10 +70,8 @@ export default function RootLayout({
         
         {/* Google AdSense Script */}
         <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
+         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
+     crossorigin="anonymous"></script>
         />
       </head>
       <body className={cn(
