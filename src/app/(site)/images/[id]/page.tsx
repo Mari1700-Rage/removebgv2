@@ -1,25 +1,51 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Image Details - AI Background Remover",
-  description: "View and edit your processed image",
+  title: "Your Processed Images | Background Removed Photos | Eraseto",
+  description:
+    "View and download your processed images with backgrounds removed. High-quality transparent PNG files ready for use.",
+  keywords:
+    "processed images, background removed photos, transparent PNG downloads, edited images",
+  alternates: {
+    canonical: "https://eraseto.com/images",
+  },
+  openGraph: {
+    title: "Your Processed Images | Eraseto",
+    description:
+      "View and download your background-removed images in high quality.",
+    url: "https://eraseto.com/images",
+    images: [
+      {
+        url: "/og-image-images.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Eraseto - Your Processed Images",
+      },
+    ],
+  },
 };
 
-export function generateStaticParams() {
-  return [{ id: "placeholder" }];
-}
-
-interface Props {
-  params: {
-    id: string;
-  };
-}
-
-export default function page({ params: { id } }: Props) {
+export default function ImagesLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Image Details</h1>
-      <p>This page will be populated with client-side data for ID: {id}</p>
-    </div>
+    <html lang="en">
+      <head>
+        {/* Google AdSense Script */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+          data-ad-client="ca-pub-XXXXXXXXXXXXXXX" // replace with your client ID
+          strategy="afterInteractive"
+        />
+      </head>
+      <body>
+        {/* Optional: You could wrap the layout if you need a container */}
+        {children}
+      </body>
+    </html>
   );
 }
