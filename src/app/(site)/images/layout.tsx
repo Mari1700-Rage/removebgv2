@@ -27,7 +27,6 @@ export const metadata: Metadata = {
 
 export default function ImagesLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
       {/* Optionally add Google AdSense script if not loaded globally */}
       <Script
         async
