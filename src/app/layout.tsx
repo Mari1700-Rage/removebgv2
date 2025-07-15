@@ -53,8 +53,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   minimumScale: 1,
   initialScale: 1,
-  userScalable: false,
+  userScalable: false
 };
+
 
 export default function RootLayout({
   children,
@@ -66,20 +67,23 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="google-site-verification" content="your-verification-code" />
-
-        {/* ✅ Google AdSense Script */}
+        
+        {/* Google AdSense Script */}
         <Script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
       </head>
-      <body className={cn("min-h-dvh bg-background antialiased", GeistSans.className)}>
+      <body className={cn(
+        "min-h-dvh bg-background antialiased",
+        GeistSans.className
+      )}>
         <Providers>
           {children}
         </Providers>
       </body>
     </html>
-  );
+  )
 }
