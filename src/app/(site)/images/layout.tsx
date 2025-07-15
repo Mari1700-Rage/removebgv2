@@ -25,14 +25,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ImagesLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ImagesLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {/* Google AdSense Script (optional here, if not already in root layout) */}
+      {/* Optionally add Google AdSense script if not loaded globally */}
       <Script
         async
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
@@ -43,4 +39,5 @@ export default function ImagesLayout({
     </>
   );
 }
+
 
