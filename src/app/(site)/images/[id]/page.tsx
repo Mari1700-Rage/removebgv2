@@ -38,7 +38,7 @@ export default function ImagesLayout({
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-          data-ad-client="ca-pub-XXXXXXXXXXXXXXX" // replace with your client ID
+          data-ad-client="ca-pub-4619589162374260" // replace with your client ID
           strategy="afterInteractive"
         />
       </head>
