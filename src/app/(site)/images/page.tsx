@@ -39,4 +39,5 @@ export default function ImagesPage() {
       </Suspense>
       <HowTo />
     </section>
+  )
 }
