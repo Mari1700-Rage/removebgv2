@@ -1,9 +1,13 @@
+// File: src/app/(site)/images/layout.tsx
 import type { Metadata } from "next";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Your Processed Images | Background Removed Photos | Eraseto",
-  description: "View and download your processed images with backgrounds removed. High-quality transparent PNG files ready for use.",
-  keywords: "processed images, background removed photos, transparent PNG downloads, edited images",
+  description:
+    "View and download your processed images with backgrounds removed. High-quality transparent PNG files ready for use.",
+  keywords:
+    "processed images, background removed photos, transparent PNG downloads, edited images",
   alternates: {
     canonical: "https://eraseto.com/images",
   },
@@ -27,5 +31,16 @@ export default function ImagesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
-} 
+  return (
+    <>
+      {/* Optional: Google AdSense Script */}
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
+      <main>{children}</main>
+    </>
+  );
+}
