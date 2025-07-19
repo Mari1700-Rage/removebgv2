@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect } from 'react';  // <-- Added useEffect import
 import Image from 'next/image';
 import Link from 'next/link';
