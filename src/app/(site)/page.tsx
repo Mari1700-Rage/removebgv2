@@ -1,25 +1,66 @@
 "use client";
 
-import React, { useEffect } from 'react';  // <-- Added useEffect import
+import React, { useEffect, RefObject } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LuStar, LuMinus, LuPlus } from 'react-icons/lu';
 
-export default function YourComponent({ currentTheme, steps, testimonials, faqs, dropzoneRef, openFaq, toggleFaq, contentRefs }) {
+interface Step {
+  title: string;
+  description: string;
+}
 
+interface Testimonial {
+  rating: number;
+  content: string;
+  name: string;
+  role: string;
+}
+
+interface Faq {
+  question: string;
+  answer: React.ReactNode;
+}
+
+interface Props {
+  currentTheme: 'light' | 'dark';
+  steps: Step[];
+  testimonials: Testimonial[];
+  faqs: Faq[];
+  dropzoneRef: RefObject<HTMLDivElement>;
+  openFaq: number | null;
+  toggleFaq: (index: number) => void;
+  contentRefs: RefObject<HTMLDivElement>[];
+}
+
+export default function YourComponent({
+  currentTheme,
+  steps,
+  testimonials,
+  faqs,
+  dropzoneRef,
+  openFaq,
+  toggleFaq,
+  contentRefs,
+}: Props) {
   useEffect(() => {
-    if (window) {
+    // Dynamically load Google AdSense script
+    const script = document.createElement('script');
+    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+    script.async = true;
+    script.onload = () => {
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (e) {
-        // AdSense script not loaded yet or error, safely ignore
+        // ignore
       }
-    }
+    };
+    document.head.appendChild(script);
   }, []);
 
   return (
     <>
-      {/* Your original full code starts here */}
+      {/* Your original code with inserted typed props */}
       
       {/* How To Section */}
       <div className={`py-16 ${
@@ -346,8 +387,8 @@ export default function YourComponent({ currentTheme, steps, testimonials, faqs,
             <ins
               className="adsbygoogle"
               style={{ display: 'block', width: '320px', height: '100px' }}
-              data-ad-client="ca-pub-4619589162374260"  // <-- Replace with your AdSense client ID
-              data-ad-slot="4619589162374260"                // <-- Replace with your ad slot ID
+              data-ad-client="ca-pub-4619589162374260"  // Replace with your AdSense client ID
+              data-ad-slot="4619589162374260"           // Replace with your ad slot ID
               data-ad-format="auto"
               data-full-width-responsive="true"
             ></ins>
@@ -407,41 +448,5 @@ export default function YourComponent({ currentTheme, steps, testimonials, faqs,
                     aria-expanded={openFaq === index}
                 >
                   <h3 className={`text-lg font-semibold pr-4 ${
-                      currentTheme === 'light' ? 'text-gray-900' : 'text-white'
-                  }`}>
-                    {faq.question}
-                  </h3>
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 transition-all duration-300 ${
-                      currentTheme === 'light'
-                          ? 'bg-gray-100'
-                          : 'bg-gray-700'
-                  } ${
-                      openFaq === index 
-                          ? 'transform rotate-45'
-                          : ''
-                  }`}>
-                    {openFaq === index ? <LuMinus className="w-5 h-5" /> : <LuPlus className="w-5 h-5" />}
-                  </div>
-                </button>
-
-                {openFaq === index && (
-                  <div 
-                      className={`px-6 pb-6 ${
-                          currentTheme === 'light' ? 'text-gray-700' : 'text-gray-300'
-                      }`}
-                      ref={contentRefs[index]}
-                      style={{ maxHeight: 'none', transition: 'max-height 0.3s ease' }}
-                  >
-                    {faq.answer}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* End of your original code */}
-    </>
-  );
-}
+                      currentTheme === 'light' ?
+                }
