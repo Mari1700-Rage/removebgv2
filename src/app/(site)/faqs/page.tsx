@@ -7,24 +7,27 @@ import Script from "next/script";
 import { useTheme } from "next-themes";
 
 export default function FAQsPage() {
-    const [openFaq, setOpenFaq] = useState<number | null>(0); // Start with first FAQ open
+    const [openFaq, setOpenFaq] = useState<number | null>(0);
     const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
     const { theme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
-    
-    // After mounting, we can safely access the theme
+
     useEffect(() => {
         setMounted(true);
+
+        try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+            console.error("AdSense error", e);
+        }
     }, []);
-    
-    // Use resolvedTheme if available, fallback to theme, and default to 'light' when not mounted yet
+
     const currentTheme = mounted ? resolvedTheme || theme : 'light';
 
     const toggleFaq = (index: number) => {
         setOpenFaq(openFaq === index ? null : index);
     };
 
-    // FAQ data
     const faqs = [
         {
             question: "How does the background remover work?",
@@ -58,6 +61,16 @@ export default function FAQsPage() {
 
     return (
         <>
+            {/* AdSense script */}
+            <Script
+                id="adsense-script"
+                async
+                strategy="afterInteractive"
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                crossOrigin="anonymous"
+            />
+
+            {/* JSON-LD FAQ Schema */}
             <Script 
                 id="faq-schema" 
                 type="application/ld+json"
@@ -76,6 +89,7 @@ export default function FAQsPage() {
                     })
                 }}
             />
+
             <div className={`min-h-screen ${
                 currentTheme === 'light' ? 'bg-gray-50 text-gray-900' : 'bg-gray-900 text-white'
             } py-16`}>
@@ -203,8 +217,20 @@ export default function FAQsPage() {
                             </Link>
                         </div>
                     </div>
+
+                    {/* AdSense ad slot */}
+                    <div className="mt-10 text-center">
+                        <ins
+                            className="adsbygoogle"
+                            style={{ display: 'block' }}
+                            data-ad-client="ca-pub-4619589162374260"
+                            data-ad-slot="4619589162374260"
+                            data-ad-format="auto"
+                            data-full-width-responsive="true"
+                        />
+                    </div>
                 </div>
             </div>
         </>
     );
-} 
+}
