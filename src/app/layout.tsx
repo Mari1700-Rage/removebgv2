@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { GeistSans } from 'geist/font/sans';
+import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "./Providers";
@@ -7,8 +7,10 @@ import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "AI Background Remover | Free Online Background Eraser Tool | Eraseto",
-  description: "Remove image backgrounds instantly with Eraseto's AI Background Remover. Get perfect transparent PNG images for free in one click. No signup required.",
-  keywords: "background remover, remove background, transparent background, image editing, AI background removal, photo editor, PNG converter, transparent PNG",
+  description:
+    "Remove image backgrounds instantly with Eraseto's AI Background Remover. Get perfect transparent PNG images for free in one click. No signup required.",
+  keywords:
+    "background remover, remove background, transparent background, image editing, AI background removal, photo editor, PNG converter, transparent PNG",
   creator: "WEB PROJECT SOLUTIONS LTD",
   metadataBase: new URL("https://eraseto.com"),
   openGraph: {
@@ -16,7 +18,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://eraseto.com",
     title: "Free AI Background Remover | Eraseto",
-    description: "Remove backgrounds from images in seconds with our AI-powered tool. Free, fast, and no signup required.",
+    description:
+      "Remove backgrounds from images in seconds with our AI-powered tool. Free, fast, and no signup required.",
     siteName: "Eraseto Background Remover",
     images: [
       {
@@ -30,7 +33,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Free AI Background Remover | Eraseto",
-    description: "Remove backgrounds from images instantly with our AI-powered tool. Free, fast, and no signup required.",
+    description:
+      "Remove backgrounds from images instantly with our AI-powered tool. Free, fast, and no signup required.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -39,9 +43,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   alternates: {
@@ -50,12 +54,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   minimumScale: 1,
   initialScale: 1,
-  userScalable: false
+  userScalable: false,
 };
-
 
 export default function RootLayout({
   children,
@@ -66,24 +69,29 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <meta name="google-site-verification" content="your-verification-code" />
-        
-        {/* Google AdSense Script */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
+        <meta
+          name="google-site-verification"
+          content="your-verification-code"
         />
       </head>
-      <body className={cn(
-        "min-h-dvh bg-background antialiased",
-        GeistSans.className
-      )}>
+      <body
+        className={cn(
+          "min-h-dvh bg-background antialiased",
+          GeistSans.className
+        )}
+      >
         <Providers>
           {children}
+
+          {/* Google AdSense Script moved to body for proper loading */}
+          <Script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
         </Providers>
       </body>
     </html>
-  )
+  );
 }
