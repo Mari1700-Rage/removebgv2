@@ -1,13 +1,18 @@
 "use client"
 
-import { cn } from "@/lib/utils";
-import { useCallback, useEffect, useState } from "react";
+import { cn } from "@/lib/utils"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 type BackgroundImage = {
-  id: string;
-  src: string;
-  alt: string;
-};
+  id: string
+  src: string
+  alt: string
+}
 
 const backgroundImages: BackgroundImage[] = [
   { id: "1", src: "/background/1-min.jpg", alt: "Background 1" },
@@ -27,63 +32,68 @@ const backgroundImages: BackgroundImage[] = [
   { id: "15", src: "/background/15-min.jpg", alt: "Background 15" },
   { id: "16", src: "/background/16-min.jpg", alt: "Background 16" },
   { id: "17", src: "/background/17-min.jpg", alt: "Background 17" },
-];
+]
 
-// Number of items to show in each page of the carousel
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 5
 
 interface BackgroundSelectorProps {
-  selectedBackground: string | null;
-  onSelectBackground: (background: string | null) => void;
-  rightElement?: React.ReactNode;
+  selectedBackground: string | null
+  onSelectBackground: (background: string | null) => void
+  rightElement?: React.ReactNode
 }
+
+// Used only once, so safe to define outside render
+const TRANSPARENT_BG =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC"
 
 export default function BackgroundSelector({
   selectedBackground,
   onSelectBackground,
   rightElement,
 }: BackgroundSelectorProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  
-  const totalPages = Math.ceil(backgroundImages.length / ITEMS_PER_PAGE);
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
 
+  const totalPages = Math.ceil(backgroundImages.length / ITEMS_PER_PAGE)
+
+  // Preload only first page + one ahead
   useEffect(() => {
-    // Preload background images
+    const preloadImages = backgroundImages.slice(0, ITEMS_PER_PAGE * 2)
     Promise.all(
-      backgroundImages.slice(0, 6).map((img) => {
+      preloadImages.map((img) => {
         return new Promise((resolve) => {
-          const image = new Image();
-          image.src = img.src;
-          image.onload = resolve;
-          image.onerror = resolve; // Still resolve on error to avoid hanging
-        });
+          const image = new Image()
+          image.src = img.src
+          image.onload = resolve
+          image.onerror = resolve
+        })
       })
     ).then(() => {
-      setIsLoaded(true);
-    });
-  }, []);
+      setIsLoaded(true)
+    })
+  }, [])
 
   const handleBackgroundSelect = useCallback(
     (bg: string | null) => {
-      onSelectBackground(bg);
+      onSelectBackground(bg)
     },
     [onSelectBackground]
-  );
+  )
 
-  const goToNextPage = () => {
-    setCurrentPage((prev) => (prev === totalPages - 1 ? 0 : prev + 1));
-  };
+  const goToNextPage = useCallback(() => {
+    setCurrentPage((prev) => (prev === totalPages - 1 ? 0 : prev + 1))
+  }, [totalPages])
 
-  const goToPrevPage = () => {
-    setCurrentPage((prev) => (prev === 0 ? totalPages - 1 : prev - 1));
-  };
+  const goToPrevPage = useCallback(() => {
+    setCurrentPage((prev) => (prev === 0 ? totalPages - 1 : prev - 1))
+  }, [totalPages])
 
-  // Calculate which images to display based on current page
-  const displayedImages = [...backgroundImages].slice(
-    currentPage * ITEMS_PER_PAGE,
-    (currentPage + 1) * ITEMS_PER_PAGE
-  );
+  const displayedImages = useMemo(() => {
+    return backgroundImages.slice(
+      currentPage * ITEMS_PER_PAGE,
+      (currentPage + 1) * ITEMS_PER_PAGE
+    )
+  }, [currentPage])
 
   return (
     <div className="w-full">
@@ -115,7 +125,7 @@ export default function BackgroundSelector({
                     strokeLinejoin="round"
                     className="h-3.5 w-3.5"
                   >
-                    <polyline points="15 18 9 12 15 6"></polyline>
+                    <polyline points="15 18 9 12 15 6" />
                   </svg>
                 </button>
                 <button
@@ -133,7 +143,7 @@ export default function BackgroundSelector({
                     strokeLinejoin="round"
                     className="h-3.5 w-3.5"
                   >
-                    <polyline points="9 18 15 12 9 6"></polyline>
+                    <polyline points="9 18 15 12 9 6" />
                   </svg>
                 </button>
               </div>
@@ -141,6 +151,7 @@ export default function BackgroundSelector({
           )}
         </div>
       </div>
+
       <div className="relative">
         <div
           className={cn(
@@ -148,7 +159,7 @@ export default function BackgroundSelector({
             !isLoaded && "opacity-50"
           )}
         >
-          {/* None/Transparent option - always show */}
+          {/* Transparent Option */}
           <button
             onClick={() => handleBackgroundSelect(null)}
             className={cn(
@@ -160,11 +171,13 @@ export default function BackgroundSelector({
             aria-label="No background/transparent"
           >
             <div className="h-full w-full rounded-md bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC')] bg-repeat flex items-center justify-center">
-              <span className="text-xs font-medium text-gray-500 bg-white/70 px-1.5 py-0.5 rounded">None</span>
+              <span className="text-xs font-medium text-gray-500 bg-white/70 px-1.5 py-0.5 rounded">
+                None
+              </span>
             </div>
           </button>
 
-          {/* Background images - show based on current page */}
+          {/* Background images */}
           {displayedImages.map((background) => (
             <button
               key={background.id}
@@ -194,19 +207,19 @@ export default function BackgroundSelector({
                     strokeLinejoin="round"
                     className="size-full p-0.5"
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
+                    <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </div>
               )}
             </button>
           ))}
         </div>
-        
-        {/* Carousel Indicators */}
+
+        {/* Carousel indicators */}
         <div className="mt-4 flex justify-center gap-1.5">
           {Array.from({ length: totalPages }).map((_, index) => (
             <button
-              key={index}
+              key={`carousel-dot-${index}`}
               onClick={() => setCurrentPage(index)}
               className={cn(
                 "h-1.5 w-6 rounded-full transition-all",
@@ -220,5 +233,5 @@ export default function BackgroundSelector({
         </div>
       </div>
     </div>
-  );
-} 
+  )
+}
