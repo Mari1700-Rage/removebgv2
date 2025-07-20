@@ -206,7 +206,7 @@ export default function FAQsPage() {
                             className="adsbygoogle"
                             style={{ display: "block" }}
                             data-ad-client="ca-pub-4619589162374260"
-                            data-ad-slot="YOUR_SLOT_ID"
+                            data-ad-slot="4619589162374260"
                             data-ad-format="auto"
                             data-full-width-responsive="true"
                         ></ins>
