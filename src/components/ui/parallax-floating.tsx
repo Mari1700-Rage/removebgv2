@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
-
 import { cn } from "@/lib/utils"
 
 interface FloatingProps {
@@ -25,25 +24,38 @@ function Floating({
 }: FloatingProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const ref = useRef<HTMLDivElement>(null)
+  const animationFrame = useRef<number | null>(null)
 
   useEffect(() => {
     if (!ref.current) return
 
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e
-      const { left, top, width, height } = ref.current!.getBoundingClientRect()
-      
-      // Calculate mouse position relative to the center of the container
-      const x = (clientX - left - width / 2) / (width / 2)
-      const y = (clientY - top - height / 2) / (height / 2)
-      
-      setPosition({ x, y })
+      const rect = ref.current!.getBoundingClientRect()
+
+      const width = rect.width
+      const height = rect.height
+      if (width < 1 || height < 1) return
+
+      const x = (clientX - rect.left - width / 2) / (width / 2)
+      const y = (clientY - rect.top - height / 2) / (height / 2)
+
+      if (animationFrame.current) {
+        cancelAnimationFrame(animationFrame.current)
+      }
+
+      animationFrame.current = requestAnimationFrame(() => {
+        setPosition({ x, y })
+      })
     }
 
     window.addEventListener("mousemove", handleMouseMove)
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove)
+      if (animationFrame.current) {
+        cancelAnimationFrame(animationFrame.current)
+      }
     }
   }, [])
 
@@ -69,7 +81,6 @@ function Floating({
   )
 }
 
-// The FloatingElement is the component that actually moves
 const FloatingElement = ({
   children,
   className,
@@ -91,4 +102,4 @@ const FloatingElement = ({
 }
 
 export { Floating, FloatingElement }
-export default Floating 
+export default Floating
