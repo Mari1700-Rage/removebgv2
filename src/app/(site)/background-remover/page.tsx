@@ -60,6 +60,18 @@ export default function BackgroundRemoverPage() {
     if (!hasWebGPU) {
       console.info("WebGPU not available — falling back to CPU if possible.");
     }
+
+    // Load Google AdSense
+    const script = document.createElement("script");
+    script.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   const currentTheme = mounted ? resolvedTheme || theme : "light";
@@ -112,8 +124,6 @@ export default function BackgroundRemoverPage() {
               className={`text-lg ${
                 currentTheme === "light" ? "text-gray-600" : "text-gray-300"
               } mb-8 max-w-2xl mx-auto`}
-              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
-     crossorigin="anonymous"></script>
             >
               Transform your images with AI-powered background removal. Achieve professional results in seconds.
             </p>
