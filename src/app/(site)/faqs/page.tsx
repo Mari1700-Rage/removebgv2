@@ -66,7 +66,7 @@ export default function FAQsPage() {
                 id="adsense-script"
                 async
                 strategy="afterInteractive"
-                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
                 crossOrigin="anonymous"
             />
 
