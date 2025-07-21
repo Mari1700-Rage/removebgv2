@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/public/',
+      disallow: '/private/',
     },
     sitemap: 'https://eraseto.com/sitemap.xml',
   };
