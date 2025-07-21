@@ -133,7 +133,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
                             <div className="hidden md:flex items-center gap-3">
                                 {/* Buy me a coffee button */}
                                 <a 
-                                    href="https://ko-fi.com/eraseto" 
+                                    href="https://ko-fi.com/s/864adbc7bd" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center px-4 py-2 bg-[#FF5F5F] hover:bg-[#FF4444] text-white text-sm font-medium rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm hover:shadow-md"
