@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import {
   useCallback,
@@ -8,43 +9,25 @@ import {
   useState,
 } from "react"
 
-type BackgroundImage = {
-  id: string
-  src: string
-  alt: string
-}
-
-const backgroundImages: BackgroundImage[] = [
-  { id: "1", src: "/background/1-min.jpg", alt: "Background 1" },
-  { id: "2", src: "/background/2-min.jpg", alt: "Background 2" },
-  { id: "3", src: "/background/3-min.jpg", alt: "Background 3" },
-  { id: "4", src: "/background/4-min.jpg", alt: "Background 4" },
-  { id: "5", src: "/background/5-min.jpg", alt: "Background 5" },
-  { id: "6", src: "/background/6-min.jpg", alt: "Background 6" },
-  { id: "7", src: "/background/7-min.jpg", alt: "Background 7" },
-  { id: "8", src: "/background/8-min.jpg", alt: "Background 8" },
-  { id: "9", src: "/background/9-min.jpg", alt: "Background 9" },
-  { id: "10", src: "/background/10-min.jpg", alt: "Background 10" },
-  { id: "11", src: "/background/11-min.jpg", alt: "Background 11" },
-  { id: "12", src: "/background/12-min.jpg", alt: "Background 12" },
-  { id: "13", src: "/background/13-min.jpg", alt: "Background 13" },
-  { id: "14", src: "/background/14-min.jpg", alt: "Background 14" },
-  { id: "15", src: "/background/15-min.jpg", alt: "Background 15" },
-  { id: "16", src: "/background/16-min.jpg", alt: "Background 16" },
-  { id: "17", src: "/background/17-min.jpg", alt: "Background 17" },
-]
+const backgroundImages = Array.from({ length: 17 }, (_, i) => {
+  const id = `${i + 1}`
+  return {
+    id,
+    src: `/background/${id}-min.jpg`,
+    alt: `Background ${id}`,
+  }
+})
 
 const ITEMS_PER_PAGE = 5
+
+const TRANSPARENT_BG =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC"
 
 interface BackgroundSelectorProps {
   selectedBackground: string | null
   onSelectBackground: (background: string | null) => void
   rightElement?: React.ReactNode
 }
-
-// Used only once, so safe to define outside render
-const TRANSPARENT_BG =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC"
 
 export default function BackgroundSelector({
   selectedBackground,
@@ -53,24 +36,23 @@ export default function BackgroundSelector({
 }: BackgroundSelectorProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [isZoomed, setIsZoomed] = useState(false)
 
-  const totalPages = Math.ceil(backgroundImages.length / ITEMS_PER_PAGE)
+  const totalPages = useMemo(() => Math.ceil(backgroundImages.length / ITEMS_PER_PAGE), [])
 
-  // Preload only first page + one ahead
   useEffect(() => {
     const preloadImages = backgroundImages.slice(0, ITEMS_PER_PAGE * 2)
     Promise.all(
       preloadImages.map((img) => {
         return new Promise((resolve) => {
-          const image = new Image()
+          const image = new window.Image()
           image.src = img.src
           image.onload = resolve
           image.onerror = resolve
         })
       })
-    ).then(() => {
-      setIsLoaded(true)
-    })
+    ).then(() => setIsLoaded(true))
   }, [])
 
   const handleBackgroundSelect = useCallback(
@@ -97,6 +79,38 @@ export default function BackgroundSelector({
 
   return (
     <div className="w-full">
+      {previewImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md transition-all">
+          <div className="relative w-[90vw] max-w-3xl h-[70vh] bg-white rounded-xl overflow-hidden animate-fade-in">
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-2 right-2 z-10 text-white bg-black/60 rounded-full p-1 hover:bg-black"
+              aria-label="Close preview"
+            >
+              ✕
+            </button>
+            <button
+              onClick={() => setIsZoomed((z) => !z)}
+              className="absolute bottom-2 left-2 z-10 bg-black/60 text-white px-2 py-1 text-xs rounded hover:bg-black"
+            >
+              {isZoomed ? "Reset Zoom" : "Zoom"}
+            </button>
+            <div className="relative w-full h-full">
+              <Image
+                src={previewImage}
+                alt="Preview"
+                fill
+                className={cn(
+                  "object-contain transition-transform duration-300",
+                  isZoomed && "scale-150"
+                )}
+                sizes="90vw"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-medium text-gray-700">
           Background Images
@@ -169,6 +183,10 @@ export default function BackgroundSelector({
                 : "ring-1 ring-gray-200 hover:ring-[#6C5CE7]/50"
             )}
             aria-label="No background/transparent"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleBackgroundSelect(null)
+            }}
           >
             <div className="h-full w-full rounded-md bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC')] bg-repeat flex items-center justify-center">
               <span className="text-xs font-medium text-gray-500 bg-white/70 px-1.5 py-0.5 rounded">
@@ -177,27 +195,45 @@ export default function BackgroundSelector({
             </div>
           </button>
 
-          {/* Background images */}
-          {displayedImages.map((background) => (
-            <button
-              key={background.id}
-              onClick={() => handleBackgroundSelect(background.src)}
+          {/* Background Images */}
+          {displayedImages.map((bg) => (
+            <div
+              key={bg.id}
               className={cn(
-                "aspect-square rounded-lg p-0.5 transition-all overflow-hidden relative",
-                selectedBackground === background.src
+                "relative aspect-square rounded-lg p-0.5 overflow-hidden group",
+                selectedBackground === bg.src
                   ? "ring-2 ring-[#6C5CE7] ring-offset-2"
                   : "ring-1 ring-gray-200 hover:ring-[#6C5CE7]/50"
               )}
-              aria-label={background.alt}
             >
-              <img
-                src={background.src}
-                alt={background.alt}
-                className="h-full w-full object-cover rounded-md"
-                loading={parseInt(background.id) > 6 ? "lazy" : "eager"}
+              <button
+                onClick={() => handleBackgroundSelect(bg.src)}
+                aria-label={bg.alt}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleBackgroundSelect(bg.src)
+                }}
+                className="absolute inset-0 z-10"
               />
-              {selectedBackground === background.src && (
-                <div className="absolute -right-1 -top-1 size-3 rounded-full bg-[#6C5CE7] ring-2 ring-white shadow-md">
+              <div className="relative w-full h-full">
+                <Image
+                  src={bg.src}
+                  alt={bg.alt}
+                  fill
+                  className="object-cover rounded-md"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  priority={parseInt(bg.id) <= 6}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewImage(bg.src)}
+                className="absolute bottom-1 right-1 z-20 rounded bg-white/80 px-1.5 py-0.5 text-xs text-gray-700 shadow hover:bg-white"
+              >
+                Preview
+              </button>
+              {selectedBackground === bg.src && (
+                <div className="absolute -right-1 -top-1 size-3 rounded-full bg-[#6C5CE7] ring-2 ring-white shadow-md z-20">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -211,23 +247,21 @@ export default function BackgroundSelector({
                   </svg>
                 </div>
               )}
-            </button>
+            </div>
           ))}
         </div>
 
         {/* Carousel indicators */}
         <div className="mt-4 flex justify-center gap-1.5">
-          {Array.from({ length: totalPages }).map((_, index) => (
+          {Array.from({ length: totalPages }).map((_, i) => (
             <button
-              key={`carousel-dot-${index}`}
-              onClick={() => setCurrentPage(index)}
+              key={`dot-${i}`}
+              onClick={() => setCurrentPage(i)}
               className={cn(
                 "h-1.5 w-6 rounded-full transition-all",
-                currentPage === index
-                  ? "bg-[#6C5CE7]"
-                  : "bg-gray-200 hover:bg-gray-300"
+                currentPage === i ? "bg-[#6C5CE7]" : "bg-gray-200 hover:bg-gray-300"
               )}
-              aria-label={`Go to page ${index + 1}`}
+              aria-label={`Go to page ${i + 1}`}
             />
           ))}
         </div>
