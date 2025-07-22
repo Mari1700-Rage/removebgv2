@@ -6,82 +6,88 @@ import * as ort from "onnxruntime-web";
 export default function DropZone() {
   const [loading, setLoading] = useState(false);
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleFileDrop = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !file.type.startsWith("image/")) {
+      setError("Please upload a valid image file.");
+      return;
+    }
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
+
     img.onload = async () => {
       setLoading(true);
+      setResultImage(null);
+
+      const originalWidth = img.width;
+      const originalHeight = img.height;
 
       const canvas = canvasRef.current;
       if (!canvas) return;
+      canvas.width = 224;
+      canvas.height = 224;
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
+      ctx.drawImage(img, 0, 0, 224, 224);
 
-      // Set canvas size to model expected input size
-      const width = 224;
-      const height = 224;
-      canvas.width = width;
-      canvas.height = height;
+      const imageData = ctx.getImageData(0, 0, 224, 224).data;
+      const floatArray = new Float32Array(224 * 224 * 3);
 
-      // Draw uploaded image resized on canvas
-      ctx.drawImage(img, 0, 0, width, height);
-
-      // Get pixel data from canvas
-      const imageData = ctx.getImageData(0, 0, width, height).data;
-
-      // Convert RGBA to float32 RGB and normalize to [0,1]
-      const floatArray = new Float32Array(width * height * 3);
-      for (let i = 0; i < width * height; i++) {
+      for (let i = 0; i < 224 * 224; i++) {
         floatArray[i * 3 + 0] = imageData[i * 4 + 0] / 255;
         floatArray[i * 3 + 1] = imageData[i * 4 + 1] / 255;
         floatArray[i * 3 + 2] = imageData[i * 4 + 2] / 255;
       }
 
       try {
-        // Load ONNX model from public folder
         const session = await ort.InferenceSession.create("/model.onnx");
+        const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
+        const feeds: Record<string, ort.Tensor> = {
+          [session.inputNames[0]]: inputTensor,
+        };
 
-        // Create tensor with shape [1, 3, height, width]
-        const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, height, width]);
-        const feeds: Record<string, ort.Tensor> = {};
-        feeds[session.inputNames[0]] = inputTensor;
-
-        // Run inference
         const output = await session.run(feeds);
         const mask = output[session.outputNames[0]].data as Float32Array;
 
-        // Prepare output canvas and context
         const outputCanvas = document.createElement("canvas");
-        outputCanvas.width = width;
-        outputCanvas.height = height;
+        outputCanvas.width = originalWidth;
+        outputCanvas.height = originalHeight;
+
         const outputCtx = outputCanvas.getContext("2d");
-        if (!outputCtx) {
-          setLoading(false);
-          return;
-        }
+        if (!outputCtx) return;
 
-        // Create image data for output
-        const outputImg = outputCtx.createImageData(width, height);
+        const fullSizeCanvas = document.createElement("canvas");
+        fullSizeCanvas.width = originalWidth;
+        fullSizeCanvas.height = originalHeight;
+        const fullCtx = fullSizeCanvas.getContext("2d");
+        if (!fullCtx) return;
+        fullCtx.drawImage(img, 0, 0, originalWidth, originalHeight);
+        const fullData = fullCtx.getImageData(0, 0, originalWidth, originalHeight).data;
 
-        // Compose output image with alpha channel from mask
+        const maskCanvas = document.createElement("canvas");
+        maskCanvas.width = 224;
+        maskCanvas.height = 224;
+        const maskCtx = maskCanvas.getContext("2d");
+        if (!maskCtx) return;
+
+        const outputImg = maskCtx.createImageData(224, 224);
         for (let i = 0; i < mask.length; i++) {
-          const alpha = Math.floor(mask[i] * 255);
           outputImg.data[i * 4 + 0] = imageData[i * 4 + 0];
           outputImg.data[i * 4 + 1] = imageData[i * 4 + 1];
           outputImg.data[i * 4 + 2] = imageData[i * 4 + 2];
-          outputImg.data[i * 4 + 3] = alpha;
+          outputImg.data[i * 4 + 3] = Math.floor(mask[i] * 255);
         }
 
-        // Draw image data to output canvas
-        outputCtx.putImageData(outputImg, 0, 0);
+        maskCtx.putImageData(outputImg, 0, 0);
 
-        // Convert canvas to blob and create URL to display
+        outputCtx.drawImage(maskCanvas, 0, 0, originalWidth, originalHeight);
+
         outputCanvas.toBlob((blob) => {
           if (blob) {
             const url = URL.createObjectURL(blob);
@@ -89,22 +95,38 @@ export default function DropZone() {
           }
           setLoading(false);
         });
-      } catch (error) {
-        console.error("ONNX inference error:", error);
+      } catch (err) {
+        console.error("Model processing error:", err);
+        setError("Failed to process image. Try a different one.");
         setLoading(false);
       }
+    };
+
+    img.onerror = () => {
+      setError("Could not load the selected image.");
+      setLoading(false);
     };
   }, []);
 
   return (
-    <div className="w-full max-w-md mx-auto text-center space-y-4">
-      <input type="file" accept="image/*" onChange={handleFileDrop} />
+    <div className="w-full max-w-lg mx-auto text-center p-4">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileDrop}
+        className="mb-4 block w-full text-sm"
+      />
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      {loading && <p className="text-blue-500">Processing...</p>}
+      {loading && <p className="text-blue-500">Removing background...</p>}
+      {error && <p className="text-red-500">{error}</p>}
       {resultImage && (
         <div>
           <p className="font-medium mb-2">Result:</p>
-          <img src={resultImage} alt="Background Removed" className="rounded shadow" />
+          <img
+            src={resultImage}
+            alt="Processed"
+            className="rounded shadow max-w-full h-auto"
+          />
         </div>
       )}
     </div>
