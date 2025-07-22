@@ -42,7 +42,7 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['your-vercel-domain.vercel.app'], // ✅ Replace with your actual domain
+    domains: ['https://eraseto.com'], // ✅ Replace with your actual domain
   },
   async headers() {
     return [
