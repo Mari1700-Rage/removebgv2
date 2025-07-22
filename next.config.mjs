@@ -4,13 +4,53 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/** ✅ Define secure headers including CSP */
+const securityHeaders = [
+  {
+    key: 'Content-Security-Policy',
+    value: `
+      default-src 'self';
+      script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com;
+      style-src 'self' 'unsafe-inline';
+      img-src * data:;
+      connect-src *;
+      frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com;
+      child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com;
+    `.replace(/\n/g, '').trim(),
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'strict-origin-when-cross-origin',
+  },
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+  {
+    key: 'X-Frame-Options',
+    value: 'DENY',
+  },
+  {
+    key: 'X-XSS-Protection',
+    value: '1; mode=block',
+  },
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  trailingSlash: false, // or keep true if you're sure
+  trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['your-vercel-domain.vercel.app'], // UPDATE this!
+    domains: ['your-vercel-domain.vercel.app'], // ✅ Replace with your actual domain
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: securityHeaders,
+      },
+    ];
   },
   webpack: (config) => {
     config.resolve = {
