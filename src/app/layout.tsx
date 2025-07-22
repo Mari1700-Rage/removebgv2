@@ -3,7 +3,6 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "./Providers";
-import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "AI Background Remover | Free Online Background Eraser Tool | Eraseto",
@@ -73,6 +72,13 @@ export default function RootLayout({
           name="google-site-verification"
           content="your-verification-code"
         />
+
+        {/* ✅ Google AdSense script directly injected without `next/script` */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body
         className={cn(
@@ -80,17 +86,7 @@ export default function RootLayout({
           GeistSans.className
         )}
       >
-        <Providers>
-          {children}
-
-          {/* Google AdSense Script moved to body for proper loading */}
-          <Script
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
