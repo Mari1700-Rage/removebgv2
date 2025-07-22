@@ -11,16 +11,22 @@ export default function FAQsPage() {
     const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
     const { theme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const adRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setMounted(true);
-
-        try {
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {
-            console.error("AdSense error", e);
-        }
     }, []);
+
+    // Run adsbygoogle push AFTER the ins element is rendered
+    useEffect(() => {
+        if (adRef.current) {
+            try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.error("AdSense error", e);
+            }
+        }
+    }, [adRef.current]);
 
     const currentTheme = mounted ? resolvedTheme || theme : 'light';
 
@@ -219,7 +225,7 @@ export default function FAQsPage() {
                     </div>
 
                     {/* AdSense ad slot */}
-                    <div className="mt-10 text-center">
+                    <div className="mt-10 text-center" ref={adRef}>
                         <ins
                             className="adsbygoogle"
                             style={{ display: 'block' }}
