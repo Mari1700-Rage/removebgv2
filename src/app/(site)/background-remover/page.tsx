@@ -1,169 +1,242 @@
-"use client";
+"use client"
 
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
+import { LuPlus, LuMinus } from "react-icons/lu";
+import Script from "next/script";
 import { useTheme } from "next-themes";
-import HowTo from "@/components/HowTo";
 
-// Fallback DropZone loading state
-function LoadingDropZone() {
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+export default function FAQsPage() {
+    const [openFaq, setOpenFaq] = useState<number | null>(0);
+    const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const { theme, resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const adRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setMounted(true), []);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
-  const currentTheme = mounted ? resolvedTheme || theme : "light";
+    // Run adsbygoogle push AFTER the ins element is rendered
+    useEffect(() => {
+        if (adRef.current) {
+            try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.error("AdSense error", e);
+            }
+        }
+    }, [adRef.current]);
 
-  return (
-    <div
-      className={`w-full h-[300px] border-2 border-dashed ${
-        currentTheme === "light"
-          ? "border-gray-300 bg-gray-100/50"
-          : "border-gray-600 bg-gray-800/30"
-      } rounded-xl flex items-center justify-center`}
-    >
-      <div
-        className={`animate-pulse ${
-          currentTheme === "light" ? "text-gray-500" : "text-gray-300"
-        }`}
-      >
-        Loading background remover...
-      </div>
-    </div>
-  );
-}
+    const currentTheme = mounted ? resolvedTheme || theme : 'light';
 
-// Dynamically load DropZone component without SSR
-const DropZone = dynamic(() => import("@/components/DropZone"), {
-  ssr: false,
-  loading: () => <LoadingDropZone />,
-});
-
-export default function BackgroundRemoverPage() {
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [isBrowserSupported, setIsBrowserSupported] = useState(true);
-
-  useEffect(() => {
-    setMounted(true);
-
-    // Feature detection for WebGL/WebGPU
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    const hasWebGPU = "gpu" in navigator;
-
-    if (!gl) {
-      console.warn("WebGL not supported — this browser may not work.");
-      setIsBrowserSupported(false);
-    }
-
-    if (!hasWebGPU) {
-      console.info("WebGPU not available — falling back to CPU if possible.");
-    }
-
-    // Load Google AdSense
-    const script = document.createElement("script");
-    script.src =
-      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
+    const toggleFaq = (index: number) => {
+        setOpenFaq(openFaq === index ? null : index);
     };
-  }, []);
 
-  const currentTheme = mounted ? resolvedTheme || theme : "light";
+    const faqs = [
+        {
+            question: "How does the background remover work?",
+            answer: "Our background remover uses advanced AI technology to automatically detect and remove backgrounds from images. Simply upload your image, and our tool will instantly process it to create a transparent background. You can then download your image in high quality."
+        },
+        {
+            question: "Is the background remover tool free to use?",
+            answer: "Yes, our background remover tool is completely free to use with no hidden fees. You can remove backgrounds from as many images as you want without any cost."
+        },
+        {
+            question: "What file formats are supported?",
+            answer: "Our tool supports all common image formats including JPEG, PNG, WebP, and HEIC. After processing, you can download your images with transparent backgrounds as PNG files."
+        },
+        {
+            question: "How accurate is the background removal?",
+            answer: "Our AI-powered tool delivers highly accurate results in most cases. It works best with clear subjects against distinguishable backgrounds. For complex images, you might need to make minor adjustments."
+        },
+        {
+            question: "What is the maximum file size supported?",
+            answer: "You can upload images up to 5000x5000 pixels in resolution. This should be sufficient for most uses including professional photography and e-commerce product images."
+        },
+        {
+            question: "Do you store my uploaded images?",
+            answer: "We only store your images temporarily while processing them. After you download your processed images, they're automatically deleted from our servers to ensure your privacy."
+        },
+        {
+            question: "Can I remove backgrounds from images with multiple subjects?",
+            answer: "Yes, our tool can handle images with multiple subjects. The AI will detect all foreground elements and remove the background accordingly."
+        }
+    ];
 
-  return (
-    <div
-      className={`min-h-screen ${
-        currentTheme === "light" ? "bg-gray-50 text-gray-900" : "bg-gray-900 text-white"
-      } py-16`}
-    >
-      <div className="container mx-auto max-w-6xl px-4">
-        {/* Badge */}
-        <div className="max-w-3xl mx-auto mb-8">
-          <div className="flex justify-center mb-6">
-            <div
-              className={`inline-flex items-center gap-2 ${
-                currentTheme === "light"
-                  ? "bg-white border border-gray-200 shadow-sm"
-                  : "bg-gray-800 border border-gray-700 shadow-sm"
-              } rounded-2xl px-4 py-2 text-sm`}
-            >
-              <span className="text-orange-400 text-lg">🏆</span>
-              <span
-                className={`font-medium ${
-                  currentTheme === "light" ? "text-gray-900" : "text-white"
-                }`}
-              >
-                #1 Product of the Day
-              </span>
-              <span
-                className={`text-xs ${
-                  currentTheme === "light" ? "text-gray-600" : "text-gray-400"
-                } ml-1`}
-              >
-                Editors' Choice
-              </span>
+    return (
+        <>
+            {/* AdSense script */}
+            <Script
+                id="adsense-script"
+                async
+                strategy="afterInteractive"
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
+                crossOrigin="anonymous"
+            />
+
+            {/* JSON-LD FAQ Schema */}
+            <Script 
+                id="faq-schema" 
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        "mainEntity": faqs.map(faq => ({
+                            "@type": "Question",
+                            "name": faq.question,
+                            "acceptedAnswer": {
+                                "@type": "Answer",
+                                "text": faq.answer
+                            }
+                        }))
+                    })
+                }}
+            />
+
+            <div className={`min-h-screen ${
+                currentTheme === 'light' ? 'bg-gray-50 text-gray-900' : 'bg-gray-900 text-white'
+            } py-16`}>
+                <div className="container mx-auto max-w-4xl px-4">
+                    {/* Hero Section */}
+                    <div className="text-center mb-12">
+                        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${
+                            currentTheme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}>
+                            Frequently Asked Questions
+                        </h1>
+                        <p className={`text-lg ${
+                            currentTheme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                        } max-w-2xl mx-auto`}>
+                            Find answers to common questions about our background removal tool
+                        </p>
+                    </div>
+
+                    {/* FAQs */}
+                    <div className="space-y-4 mb-12">
+                        {faqs.map((faq, index) => (
+                            <div 
+                                key={index} 
+                                className={`${
+                                    currentTheme === 'light'
+                                        ? 'bg-white border border-gray-200 shadow-sm'
+                                        : 'bg-gray-800 border border-gray-700 shadow-sm'
+                                } rounded-2xl overflow-hidden transition-all duration-300 ${
+                                    openFaq === index 
+                                        ? currentTheme === 'light'
+                                            ? 'shadow-md'
+                                            : 'shadow-lg' 
+                                        : ''
+                                }`}
+                            >
+                                <button 
+                                    className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                                    onClick={() => toggleFaq(index)}
+                                    aria-expanded={openFaq === index}
+                                >
+                                    <h3 className={`text-lg font-semibold pr-4 ${
+                                        currentTheme === 'light' ? 'text-gray-900' : 'text-white'
+                                    }`}>
+                                        {faq.question}
+                                    </h3>
+                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 transition-all duration-300 ${
+                                        currentTheme === 'light'
+                                            ? 'bg-gray-100'
+                                            : 'bg-gray-700'
+                                    } ${
+                                        openFaq === index 
+                                            ? currentTheme === 'light' 
+                                                ? 'bg-gray-900 text-white' 
+                                                : 'bg-white text-gray-900' 
+                                            : currentTheme === 'light'
+                                                ? 'text-gray-600'
+                                                : 'text-gray-300'
+                                    }`}>
+                                        {openFaq === index ? 
+                                            <LuMinus className="w-4 h-4" /> : 
+                                            <LuPlus className="w-4 h-4" />
+                                        }
+                                    </div>
+                                </button>
+                                <div 
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                        openFaq === index ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                                    }`}
+                                    ref={(el) => {
+                                        contentRefs.current[index] = el;
+                                    }}
+                                    aria-hidden={openFaq !== index}
+                                >
+                                    <div className="px-6 pb-6">
+                                        <p className={`${
+                                            currentTheme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                                        } leading-relaxed`}>
+                                            {faq.answer}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* CTA Section */}
+                    <div className={`${
+                        currentTheme === 'light'
+                            ? 'bg-white border border-gray-200 shadow-sm'
+                            : 'bg-gray-800 border border-gray-700 shadow-sm'
+                    } rounded-2xl p-8 md:p-12 text-center`}>
+                        <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${
+                            currentTheme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}>
+                            Still Have Questions?
+                        </h2>
+                        <p className={`text-lg mb-8 ${
+                            currentTheme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                        } max-w-2xl mx-auto`}>
+                            If you couldn't find the answer you need, feel free to reach out to our support team
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <Link 
+                                href="/contact"
+                                className={`inline-flex items-center justify-center px-6 py-3 font-medium rounded-xl transition-all duration-300 ${
+                                    currentTheme === 'light'
+                                        ? 'bg-gray-900 hover:bg-gray-800 text-white'
+                                        : 'bg-white hover:bg-gray-100 text-gray-900'
+                                }`}
+                            >
+                                Contact Support
+                            </Link>
+                            <Link 
+                                href="/"
+                                className={`inline-flex items-center justify-center px-6 py-3 font-medium rounded-xl transition-all duration-300 ${
+                                    currentTheme === 'light'
+                                        ? 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50'
+                                        : 'bg-gray-700 border border-gray-600 text-white hover:bg-gray-600'
+                                }`}
+                            >
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                Try It Now
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* AdSense ad slot */}
+                    <div className="mt-10 text-center" ref={adRef}>
+                        <ins
+                            className="adsbygoogle"
+                            style={{ display: 'block' }}
+                            data-ad-client="ca-pub-4619589162374260"
+                            data-ad-slot="4619589162374260"
+                            data-ad-format="auto"
+                            data-full-width-responsive="true"
+                        />
+                    </div>
+                </div>
             </div>
-          </div>
-
-          {/* Header */}
-          <div className="text-center">
-            <h1
-              className={`text-4xl md:text-5xl font-bold mb-4 leading-tight ${
-                currentTheme === "light" ? "text-gray-900" : "text-white"
-              }`}
-            >
-              Remove Background From Images Instantly
-            </h1>
-            <p
-              className={`text-lg ${
-                currentTheme === "light" ? "text-gray-600" : "text-gray-300"
-              } mb-8 max-w-2xl mx-auto`}
-            >
-              Transform your images with AI-powered background removal. Achieve professional results in seconds.
-            </p>
-          </div>
-        </div>
-
-        {/* DropZone */}
-        <div className="mb-12">
-          {isBrowserSupported ? (
-            <DropZone />
-          ) : (
-            <div
-              className={`w-full h-[300px] border-2 border-dashed ${
-                currentTheme === "light"
-                  ? "border-red-300 bg-red-100/50 text-red-800"
-                  : "border-red-600 bg-red-800/30 text-red-200"
-              } rounded-2xl flex items-center justify-center text-center p-4`}
-            >
-              <div>
-                <p className="font-semibold mb-2">⚠️ Your browser is not supported</p>
-                <p className="text-sm">
-                  Background removal requires WebGL, which is not available in your browser.
-                  Please switch to <strong>Chrome</strong> or <strong>Edge</strong> for the best experience.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* HowTo */}
-        <div
-          className={`${
-            currentTheme === "light"
-              ? "bg-white border border-gray-200 shadow-sm"
-              : "bg-gray-800 border border-gray-700 shadow-sm"
-          } rounded-2xl p-8`}
-        >
-          <HowTo variant={currentTheme === "light" ? "light" : "dark"} />
-        </div>
-      </div>
-    </div>
-  );
+        </>
+    );
 }
