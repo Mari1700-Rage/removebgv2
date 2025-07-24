@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
@@ -12,21 +12,23 @@ export default function FAQsPage() {
     const { theme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const adRef = useRef<HTMLDivElement>(null);
+    const [adError, setAdError] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    // Run adsbygoogle push AFTER the ins element is rendered
+    // AdSense load
     useEffect(() => {
         if (adRef.current) {
             try {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
             } catch (e) {
                 console.error("AdSense error", e);
+                setAdError(true);
             }
         }
-    }, [adRef.current]);
+    }, []);
 
     const currentTheme = mounted ? resolvedTheme || theme : 'light';
 
@@ -100,6 +102,7 @@ export default function FAQsPage() {
                 currentTheme === 'light' ? 'bg-gray-50 text-gray-900' : 'bg-gray-900 text-white'
             } py-16`}>
                 <div className="container mx-auto max-w-4xl px-4">
+
                     {/* Hero Section */}
                     <div className="text-center mb-12">
                         <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${
@@ -224,16 +227,22 @@ export default function FAQsPage() {
                         </div>
                     </div>
 
-                    {/* AdSense ad slot */}
+                    {/* AdSense Ad Slot with fallback */}
                     <div className="mt-10 text-center" ref={adRef}>
-                        <ins
-                            className="adsbygoogle"
-                            style={{ display: 'block' }}
-                            data-ad-client="ca-pub-4619589162374260"
-                            data-ad-slot="4619589162374260"
-                            data-ad-format="auto"
-                            data-full-width-responsive="true"
-                        />
+                        {!adError ? (
+                            <ins
+                                className="adsbygoogle"
+                                style={{ display: 'block' }}
+                                data-ad-client="ca-pub-4619589162374260"
+                                data-ad-slot="4619589162374260"
+                                data-ad-format="auto"
+                                data-full-width-responsive="true"
+                            />
+                        ) : (
+                            <div className="text-sm text-gray-500 dark:text-gray-400 italic">
+                                Ad couldn’t be loaded. You may be using an ad blocker.
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
