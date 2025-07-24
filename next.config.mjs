@@ -4,12 +4,36 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/** Generates a random nonce string */
-function generateNonce() {
-  return [...Array(16)]
-    .map(() => Math.floor(Math.random() * 16).toString(16))
-    .join('');
-}
+const securityHeaders = [
+  {
+    key: 'Content-Security-Policy',
+    value: [
+      "default-src 'self'",
+      "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src * data:",
+      "connect-src *",
+      "frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
+      "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com"
+    ].join('; ')
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'strict-origin-when-cross-origin',
+  },
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+  {
+    key: 'X-Frame-Options',
+    value: 'DENY',
+  },
+  {
+    key: 'X-XSS-Protection',
+    value: '1; mode=block',
+  },
+];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -17,15 +41,13 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['eraseto.com'], // Use hostname only, no https://
+    domains: ['eraseto.com'], // hostname only, no protocol
   },
   async headers() {
     return [
       {
         source: '/(.*)',
-        headers: [
-          // We'll dynamically add CSP with nonce later in middleware, so empty here or minimal
-        ],
+        headers: securityHeaders,
       },
     ];
   },
