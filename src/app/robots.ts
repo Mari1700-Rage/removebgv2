@@ -1,14 +1,17 @@
-User-agent: Mediapartners-Google*
-Disallow:
-
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-    },
+    rules: [
+      {
+        userAgent: 'Mediapartners-Google*',
+        allow: '/',
+      },
+      {
+        userAgent: '*',
+        allow: '/',
+      },
+    ],
     sitemap: 'https://eraseto.com/sitemap.xml',
   };
-} 
+}
