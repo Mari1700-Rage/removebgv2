@@ -10,7 +10,7 @@ const backgroundImages = Array.from({ length: 18 }, (_, i) => ({
   alt: `Background ${i + 1}`,
 }))
 
-const ITEMS_PER_PAGE = 5
+const ITEMS_PER_PAGE = 6
 
 const BackgroundSelector = ({
   selectedBackground,
