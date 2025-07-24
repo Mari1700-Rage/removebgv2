@@ -4,7 +4,7 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-const backgroundImages = Array.from({ length: 17 }, (_, i) => ({
+const backgroundImages = Array.from({ length: 18 }, (_, i) => ({
   id: `${i + 1}`,
   src: `/background/${i + 1}-min.jpg`,
   alt: `Background ${i + 1}`,
