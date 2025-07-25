@@ -13,18 +13,16 @@ export default function FAQsPage() {
     const [mounted, setMounted] = useState(false);
     const adRef = useRef<HTMLDivElement>(null);
     const [adError, setAdError] = useState(false);
-    const adLoadedRef = useRef(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    // Safely load AdSense
+    // AdSense load
     useEffect(() => {
-        if (adRef.current && !adLoadedRef.current) {
+        if (adRef.current) {
             try {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
-                adLoadedRef.current = true;
             } catch (e) {
                 console.error("AdSense error", e);
                 setAdError(true);
@@ -32,8 +30,7 @@ export default function FAQsPage() {
         }
     }, []);
 
-    const currentTheme = mounted ? resolvedTheme || theme : "light";
-    const isLight = currentTheme === "light";
+    const currentTheme = mounted ? resolvedTheme || theme : 'light';
 
     const toggleFaq = (index: number) => {
         setOpenFaq(openFaq === index ? null : index);
@@ -72,6 +69,7 @@ export default function FAQsPage() {
 
     return (
         <>
+            {/* AdSense script */}
             <Script
                 id="adsense-script"
                 async
@@ -79,8 +77,10 @@ export default function FAQsPage() {
                 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260"
                 crossOrigin="anonymous"
             />
-            <Script
-                id="faq-schema"
+
+            {/* JSON-LD FAQ Schema */}
+            <Script 
+                id="faq-schema" 
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
@@ -98,81 +98,127 @@ export default function FAQsPage() {
                 }}
             />
 
-            <div className={`min-h-screen ${isLight ? 'bg-gray-50 text-gray-900' : 'bg-gray-900 text-white'} py-16`}>
+            <div className={`min-h-screen ${
+                currentTheme === 'light' ? 'bg-gray-50 text-gray-900' : 'bg-gray-900 text-white'
+            } py-16`}>
                 <div className="container mx-auto max-w-4xl px-4">
-                    
+
+                    {/* Hero Section */}
                     <div className="text-center mb-12">
-                        <h1 className={`text-3xl md:text-4xl font-bold mb-4`}>
+                        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${
+                            currentTheme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}>
                             Frequently Asked Questions
                         </h1>
-                        <p className={`text-lg max-w-2xl mx-auto ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
+                        <p className={`text-lg ${
+                            currentTheme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                        } max-w-2xl mx-auto`}>
                             Find answers to common questions about our background removal tool
                         </p>
                     </div>
 
+                    {/* FAQs */}
                     <div className="space-y-4 mb-12">
-                        {faqs.map((faq, index) => {
-                            const isOpen = openFaq === index;
-                            return (
-                                <div
-                                    key={index}
-                                    className={`rounded-2xl overflow-hidden transition-all duration-300 ${
-                                        isLight
-                                            ? 'bg-white border border-gray-200'
-                                            : 'bg-gray-800 border border-gray-700'
-                                    } ${isOpen ? 'shadow-md' : 'shadow-sm'}`}
+                        {faqs.map((faq, index) => (
+                            <div 
+                                key={index} 
+                                className={`${
+                                    currentTheme === 'light'
+                                        ? 'bg-white border border-gray-200 shadow-sm'
+                                        : 'bg-gray-800 border border-gray-700 shadow-sm'
+                                } rounded-2xl overflow-hidden transition-all duration-300 ${
+                                    openFaq === index 
+                                        ? currentTheme === 'light'
+                                            ? 'shadow-md'
+                                            : 'shadow-lg' 
+                                        : ''
+                                }`}
+                            >
+                                <button 
+                                    className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                                    onClick={() => toggleFaq(index)}
+                                    aria-expanded={openFaq === index}
                                 >
-                                    <button
-                                        className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
-                                        onClick={() => toggleFaq(index)}
-                                        aria-expanded={isOpen}
-                                    >
-                                        <h3 className={`text-lg font-semibold pr-4`}>
-                                            {faq.question}
-                                        </h3>
-                                        <div className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
-                                            isOpen
-                                                ? isLight
-                                                    ? 'bg-gray-900 text-white'
-                                                    : 'bg-white text-gray-900'
-                                                : isLight
-                                                    ? 'bg-gray-100 text-gray-600'
-                                                    : 'bg-gray-700 text-gray-300'
-                                        }`}>
-                                            {isOpen ? <LuMinus className="w-4 h-4" /> : <LuPlus className="w-4 h-4" />}
-                                        </div>
-                                    </button>
-                                    <div
-                                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                            isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-                                        }`}
-                                        ref={el => (contentRefs.current[index] = el)}
-                                        aria-hidden={!isOpen}
-                                    >
-                                        <div className="px-6 pb-6">
-                                            <p className={isLight ? 'text-gray-600' : 'text-gray-300'}>
-                                                {faq.answer}
-                                            </p>
-                                        </div>
+                                    <h3 className={`text-lg font-semibold pr-4 ${
+                                        currentTheme === 'light' ? 'text-gray-900' : 'text-white'
+                                    }`}>
+                                        {faq.question}
+                                    </h3>
+                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 transition-all duration-300 ${
+                                        currentTheme === 'light'
+                                            ? 'bg-gray-100'
+                                            : 'bg-gray-700'
+                                    } ${
+                                        openFaq === index 
+                                            ? currentTheme === 'light' 
+                                                ? 'bg-gray-900 text-white' 
+                                                : 'bg-white text-gray-900' 
+                                            : currentTheme === 'light'
+                                                ? 'text-gray-600'
+                                                : 'text-gray-300'
+                                    }`}>
+                                        {openFaq === index ? 
+                                            <LuMinus className="w-4 h-4" /> : 
+                                            <LuPlus className="w-4 h-4" />
+                                        }
+                                    </div>
+                                </button>
+                                <div 
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                        openFaq === index ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                                    }`}
+                                    ref={(el) => {
+                                        contentRefs.current[index] = el;
+                                    }}
+                                    aria-hidden={openFaq !== index}
+                                >
+                                    <div className="px-6 pb-6">
+                                        <p className={`${
+                                            currentTheme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                                        } leading-relaxed`}>
+                                            {faq.answer}
+                                        </p>
                                     </div>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
 
                     {/* CTA Section */}
-                    <div className={`${isLight ? 'bg-white border border-gray-200' : 'bg-gray-800 border border-gray-700'} rounded-2xl p-8 md:p-12 text-center`}>
-                        <h2 className={`text-3xl md:text-4xl font-bold mb-4`}>
+                    <div className={`${
+                        currentTheme === 'light'
+                            ? 'bg-white border border-gray-200 shadow-sm'
+                            : 'bg-gray-800 border border-gray-700 shadow-sm'
+                    } rounded-2xl p-8 md:p-12 text-center`}>
+                        <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${
+                            currentTheme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}>
                             Still Have Questions?
                         </h2>
-                        <p className={`text-lg mb-8 max-w-2xl mx-auto ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
+                        <p className={`text-lg mb-8 ${
+                            currentTheme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                        } max-w-2xl mx-auto`}>
                             If you couldn't find the answer you need, feel free to reach out to our support team
                         </p>
                         <div className="flex flex-wrap justify-center gap-4">
-                            <Link href="/contact" className={`inline-flex items-center justify-center px-6 py-3 font-medium rounded-xl transition-all duration-300 ${isLight ? 'bg-gray-900 hover:bg-gray-800 text-white' : 'bg-white hover:bg-gray-100 text-gray-900'}`}>
+                            <Link 
+                                href="/contact"
+                                className={`inline-flex items-center justify-center px-6 py-3 font-medium rounded-xl transition-all duration-300 ${
+                                    currentTheme === 'light'
+                                        ? 'bg-gray-900 hover:bg-gray-800 text-white'
+                                        : 'bg-white hover:bg-gray-100 text-gray-900'
+                                }`}
+                            >
                                 Contact Support
                             </Link>
-                            <Link href="/" className={`inline-flex items-center justify-center px-6 py-3 font-medium rounded-xl transition-all duration-300 ${isLight ? 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50' : 'bg-gray-700 border border-gray-600 text-white hover:bg-gray-600'}`}>
+                            <Link 
+                                href="/"
+                                className={`inline-flex items-center justify-center px-6 py-3 font-medium rounded-xl transition-all duration-300 ${
+                                    currentTheme === 'light'
+                                        ? 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50'
+                                        : 'bg-gray-700 border border-gray-600 text-white hover:bg-gray-600'
+                                }`}
+                            >
                                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                 </svg>
@@ -181,7 +227,7 @@ export default function FAQsPage() {
                         </div>
                     </div>
 
-                    {/* AdSense slot */}
+                    {/* AdSense Ad Slot with fallback */}
                     <div className="mt-10 text-center" ref={adRef}>
                         {!adError ? (
                             <ins
