@@ -9,104 +9,98 @@ export default function DropZone() {
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const handleFileDrop = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setError(null);
-    const file = event.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) {
-      setError("Please upload a valid image file.");
-      return;
-    }
-
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-
-    img.onload = async () => {
-      setLoading(true);
+  const handleFileDrop = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      setError(null);
       setResultImage(null);
+      const file = event.target.files?.[0];
 
-      const originalWidth = img.width;
-      const originalHeight = img.height;
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      canvas.width = 224;
-      canvas.height = 224;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.drawImage(img, 0, 0, 224, 224);
-
-      const imageData = ctx.getImageData(0, 0, 224, 224).data;
-      const floatArray = new Float32Array(224 * 224 * 3);
-
-      for (let i = 0; i < 224 * 224; i++) {
-        floatArray[i * 3 + 0] = imageData[i * 4 + 0] / 255;
-        floatArray[i * 3 + 1] = imageData[i * 4 + 1] / 255;
-        floatArray[i * 3 + 2] = imageData[i * 4 + 2] / 255;
+      if (!file || !file.type.startsWith("image/")) {
+        setError("Please upload a valid image file.");
+        return;
       }
 
-      try {
-        const session = await ort.InferenceSession.create("/model.onnx");
-        const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
-        const feeds: Record<string, ort.Tensor> = {
-          [session.inputNames[0]]: inputTensor,
-        };
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
 
-        const output = await session.run(feeds);
-        const mask = output[session.outputNames[0]].data as Float32Array;
+      img.onload = async () => {
+        setLoading(true);
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-        const outputCanvas = document.createElement("canvas");
-        outputCanvas.width = originalWidth;
-        outputCanvas.height = originalHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
 
-        const outputCtx = outputCanvas.getContext("2d");
-        if (!outputCtx) return;
+        const originalWidth = img.width;
+        const originalHeight = img.height;
 
-        const fullSizeCanvas = document.createElement("canvas");
-        fullSizeCanvas.width = originalWidth;
-        fullSizeCanvas.height = originalHeight;
-        const fullCtx = fullSizeCanvas.getContext("2d");
-        if (!fullCtx) return;
-        fullCtx.drawImage(img, 0, 0, originalWidth, originalHeight);
-        const fullData = fullCtx.getImageData(0, 0, originalWidth, originalHeight).data;
+        canvas.width = 224;
+        canvas.height = 224;
+        ctx.drawImage(img, 0, 0, 224, 224);
 
-        const maskCanvas = document.createElement("canvas");
-        maskCanvas.width = 224;
-        maskCanvas.height = 224;
-        const maskCtx = maskCanvas.getContext("2d");
-        if (!maskCtx) return;
+        const imageData = ctx.getImageData(0, 0, 224, 224).data;
+        const floatArray = new Float32Array(224 * 224 * 3);
 
-        const outputImg = maskCtx.createImageData(224, 224);
-        for (let i = 0; i < mask.length; i++) {
-          outputImg.data[i * 4 + 0] = imageData[i * 4 + 0];
-          outputImg.data[i * 4 + 1] = imageData[i * 4 + 1];
-          outputImg.data[i * 4 + 2] = imageData[i * 4 + 2];
-          outputImg.data[i * 4 + 3] = Math.floor(mask[i] * 255);
+        for (let i = 0; i < 224 * 224; i++) {
+          floatArray[i * 3 + 0] = imageData[i * 4 + 0] / 255;
+          floatArray[i * 3 + 1] = imageData[i * 4 + 1] / 255;
+          floatArray[i * 3 + 2] = imageData[i * 4 + 2] / 255;
         }
 
-        maskCtx.putImageData(outputImg, 0, 0);
+        try {
+          const session = await ort.InferenceSession.create("/model.onnx");
+          const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
+          const feeds = { [session.inputNames[0]]: inputTensor };
 
-        outputCtx.drawImage(maskCanvas, 0, 0, originalWidth, originalHeight);
+          const output = await session.run(feeds);
+          const mask = output[session.outputNames[0]].data as Float32Array;
 
-        outputCanvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            setResultImage(url);
+          const outputCanvas = document.createElement("canvas");
+          outputCanvas.width = originalWidth;
+          outputCanvas.height = originalHeight;
+
+          const outputCtx = outputCanvas.getContext("2d");
+          if (!outputCtx) return;
+
+          const maskCanvas = document.createElement("canvas");
+          maskCanvas.width = 224;
+          maskCanvas.height = 224;
+
+          const maskCtx = maskCanvas.getContext("2d");
+          if (!maskCtx) return;
+
+          const maskImage = maskCtx.createImageData(224, 224);
+          for (let i = 0; i < mask.length; i++) {
+            maskImage.data[i * 4 + 0] = imageData[i * 4 + 0];
+            maskImage.data[i * 4 + 1] = imageData[i * 4 + 1];
+            maskImage.data[i * 4 + 2] = imageData[i * 4 + 2];
+            maskImage.data[i * 4 + 3] = Math.floor(mask[i] * 255);
           }
-          setLoading(false);
-        });
-      } catch (err) {
-        console.error("Model processing error:", err);
-        setError("Failed to process image. Try a different one.");
-        setLoading(false);
-      }
-    };
 
-    img.onerror = () => {
-      setError("Could not load the selected image.");
-      setLoading(false);
-    };
-  }, []);
+          maskCtx.putImageData(maskImage, 0, 0);
+          outputCtx.drawImage(maskCanvas, 0, 0, originalWidth, originalHeight);
+
+          outputCanvas.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              setResultImage(url);
+            }
+            setLoading(false);
+          });
+        } catch (err) {
+          console.error("ONNX inference error:", err);
+          setError("Failed to process image.");
+          setLoading(false);
+        }
+      };
+
+      img.onerror = () => {
+        setError("Could not load the image.");
+        setLoading(false);
+      };
+    },
+    []
+  );
 
   return (
     <div className="w-full max-w-lg mx-auto text-center p-4">
