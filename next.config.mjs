@@ -41,13 +41,21 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['eraseto.com'], // hostname only, no protocol
+    domains: ['eraseto.com'],
   },
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: securityHeaders,
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/ads.txt',
+        destination: '/ads.txt',
       },
     ];
   },
