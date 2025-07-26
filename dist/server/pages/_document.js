@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 
 export default class MyDocument extends Document {
@@ -13,7 +12,10 @@ export default class MyDocument extends Document {
             crossOrigin="anonymous"
           ></script>
 
-          {/* ✅ Add meta tags for better rendering and SEO */}
+          {/* ✅ Google Site Verification Meta Tag */}
+          <meta name="google-site-verification" content="ca-pub-4619589162374260" />
+
+          {/* ✅ Meta tags for rendering and SEO */}
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
