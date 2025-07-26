@@ -41,21 +41,13 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['eraseto.com'],
+    domains: ['eraseto.com'], // hostname only, no protocol
   },
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: securityHeaders,
-      },
-    ];
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/ads.txt',
-        destination: '/ads.txt',
       },
     ];
   },
@@ -68,6 +60,7 @@ const nextConfig = {
         'onnxruntime-node$': false,
       },
       fallback: {
+        ...config.resolve.fallback,
         fs: false,
         path: false,
         crypto: false,
