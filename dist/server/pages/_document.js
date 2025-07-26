@@ -13,7 +13,7 @@ export default class MyDocument extends Document {
           ></script>
 
           {/* ✅ Google Site Verification Meta Tag */}
-          <meta name="google-site-verification" content="ca-pub-4619589162374260" />
+          <meta name="google-adsense-account" content="ca-pub-4619589162374260" />
 
           {/* ✅ Meta tags for rendering and SEO */}
           <meta charSet="UTF-8" />
