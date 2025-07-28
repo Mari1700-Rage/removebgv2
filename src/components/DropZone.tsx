@@ -20,16 +20,25 @@ export default function DropZone() {
         return;
       }
 
+      console.log("Selected file:", file);
+
       const img = new Image();
-      img.src = URL.createObjectURL(file);
+      const imgURL = URL.createObjectURL(file);
+      img.src = imgURL;
 
       img.onload = async () => {
         setLoading(true);
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+          setError("Canvas not available.");
+          return;
+        }
 
         const ctx = canvas.getContext("2d");
-        if (!ctx) return;
+        if (!ctx) {
+          setError("Canvas context not found.");
+          return;
+        }
 
         const originalWidth = img.width;
         const originalHeight = img.height;
@@ -49,6 +58,7 @@ export default function DropZone() {
 
         try {
           const session = await ort.InferenceSession.create("/model.onnx");
+          console.log("ONNX model loaded:", session);
           const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
           const feeds = { [session.inputNames[0]]: inputTensor };
 
@@ -60,14 +70,14 @@ export default function DropZone() {
           outputCanvas.height = originalHeight;
 
           const outputCtx = outputCanvas.getContext("2d");
-          if (!outputCtx) return;
+          if (!outputCtx) throw new Error("Output canvas context error.");
 
           const maskCanvas = document.createElement("canvas");
           maskCanvas.width = 224;
           maskCanvas.height = 224;
 
           const maskCtx = maskCanvas.getContext("2d");
-          if (!maskCtx) return;
+          if (!maskCtx) throw new Error("Mask canvas context error.");
 
           const maskImage = maskCtx.createImageData(224, 224);
           for (let i = 0; i < mask.length; i++) {
@@ -82,14 +92,16 @@ export default function DropZone() {
 
           outputCanvas.toBlob((blob) => {
             if (blob) {
-              const url = URL.createObjectURL(blob);
-              setResultImage(url);
+              const resultURL = URL.createObjectURL(blob);
+              setResultImage(resultURL);
+              console.log("Result image URL:", resultURL);
             }
             setLoading(false);
+            URL.revokeObjectURL(imgURL);
           });
         } catch (err) {
           console.error("ONNX inference error:", err);
-          setError("Failed to process image.");
+          setError("Failed to process image. Make sure the model is available at /model.onnx.");
           setLoading(false);
         }
       };
@@ -97,29 +109,41 @@ export default function DropZone() {
       img.onerror = () => {
         setError("Could not load the image.");
         setLoading(false);
+        URL.revokeObjectURL(imgURL);
       };
     },
     []
   );
 
   return (
-    <div className="w-full max-w-lg mx-auto text-center p-4">
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileDrop}
-        className="mb-4 block w-full text-sm"
+    <div className="w-full max-w-lg mx-auto text-center p-6 border border-gray-200 rounded-lg bg-white shadow">
+      <label className="block mb-4 cursor-pointer font-medium text-sm text-gray-700">
+        <span>Select an image to remove background:</span>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileDrop}
+          className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:border file:rounded-lg file:border-gray-300 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+        />
+      </label>
+
+      <canvas
+        ref={canvasRef}
+        width={224}
+        height={224}
+        style={{ display: "none" }}
       />
-      <canvas ref={canvasRef} style={{ display: "none" }} />
+
       {loading && <p className="text-blue-500">Removing background...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+
       {resultImage && (
-        <div>
-          <p className="font-medium mb-2">Result:</p>
+        <div className="mt-4">
+          <p className="font-semibold mb-2">Result:</p>
           <img
             src={resultImage}
             alt="Processed"
-            className="rounded shadow max-w-full h-auto"
+            className="rounded shadow max-w-full h-auto mx-auto"
           />
         </div>
       )}
