@@ -4,19 +4,18 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/** ✅ Define secure headers including CSP */
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
-    value: `
-      default-src 'self';
-      script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com;
-      style-src 'self' 'unsafe-inline';
-      img-src * data:;
-      connect-src *;
-      frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com;
-      child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com;
-    `.replace(/\n/g, '').trim(),
+    value: [
+      "default-src 'self'",
+      "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src * data:",
+      "connect-src *",
+      "frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
+      "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com"
+    ].join('; ')
   },
   {
     key: 'Referrer-Policy',
@@ -42,7 +41,7 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['https://eraseto.com'], // ✅ Replace with your actual domain
+    domains: ['eraseto.com'], // hostname only, no protocol
   },
   async headers() {
     return [
@@ -61,6 +60,7 @@ const nextConfig = {
         'onnxruntime-node$': false,
       },
       fallback: {
+        ...config.resolve.fallback,
         fs: false,
         path: false,
         crypto: false,
