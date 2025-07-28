@@ -9,8 +9,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      // Added only ep2.adtrafficquality.google to script-src
-      "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google",
+      "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src * data:",
       "connect-src *",
@@ -61,7 +60,6 @@ const nextConfig = {
         'onnxruntime-node$': false,
       },
       fallback: {
-        ...config.resolve.fallback,
         fs: false,
         path: false,
         crypto: false,
