@@ -9,6 +9,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
+      // Added only ep2.adtrafficquality.google to script-src
       "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google",
       "style-src 'self' 'unsafe-inline'",
       "img-src * data:",
@@ -16,10 +17,6 @@ const securityHeaders = [
       "frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
       "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com"
     ].join('; ')
-  },
-  // ...rest unchanged
-];
-
   },
   {
     key: 'Referrer-Policy',
