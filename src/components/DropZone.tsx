@@ -20,8 +20,6 @@ export default function DropZone() {
         return;
       }
 
-      console.log("Selected file:", file);
-
       const img = new Image();
       const imgURL = URL.createObjectURL(file);
       img.src = imgURL;
@@ -56,13 +54,32 @@ export default function DropZone() {
           floatArray[i * 3 + 2] = imageData[i * 4 + 2] / 255;
         }
 
+        let session;
         try {
-          const session = await ort.InferenceSession.create("/model.onnx");
+          session = await ort.InferenceSession.create("/model.onnx");
           console.log("ONNX model loaded:", session);
-          const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
-          const feeds = { [session.inputNames[0]]: inputTensor };
+        } catch (e) {
+          console.error("Session creation failed:", e);
+          setError("Failed to load ONNX model.");
+          setLoading(false);
+          return;
+        }
 
-          const output = await session.run(feeds);
+        const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
+        const feeds = { [session.inputNames[0]]: inputTensor };
+
+        let output;
+        try {
+          output = await session.run(feeds);
+          console.log("ONNX output:", output);
+        } catch (e) {
+          console.error("ONNX run error:", e);
+          setError("ONNX inference failed.");
+          setLoading(false);
+          return;
+        }
+
+        try {
           const mask = output[session.outputNames[0]].data as Float32Array;
 
           const outputCanvas = document.createElement("canvas");
@@ -99,9 +116,9 @@ export default function DropZone() {
             setLoading(false);
             URL.revokeObjectURL(imgURL);
           });
-        } catch (err) {
-          console.error("ONNX inference error:", err);
-          setError("Failed to process image. Make sure the model is available at /model.onnx.");
+        } catch (e) {
+          console.error("Post-processing error:", e);
+          setError("Failed to render output.");
           setLoading(false);
         }
       };
@@ -127,12 +144,7 @@ export default function DropZone() {
         />
       </label>
 
-      <canvas
-        ref={canvasRef}
-        width={224}
-        height={224}
-        style={{ display: "none" }}
-      />
+      <canvas ref={canvasRef} width={224} height={224} style={{ display: "none" }} />
 
       {loading && <p className="text-blue-500">Removing background...</p>}
       {error && <p className="text-red-500 mt-2">{error}</p>}
