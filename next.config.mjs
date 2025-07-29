@@ -9,10 +9,10 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google",
+      "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src * data:",
-      "connect-src 'self' blob: data: https://ep2.adtrafficquality.google",
+      "img-src 'self' data: https://*",
+      "connect-src 'self' https://* blob: data:",
       "worker-src 'self' blob:",
       "frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
       "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
