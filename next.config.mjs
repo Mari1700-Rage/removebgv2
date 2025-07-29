@@ -13,8 +13,12 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src * data:",
       "connect-src *",
+      "worker-src 'self' blob:",
       "frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
-      "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com"
+      "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
+      "script-src-attr 'none'",
+      "object-src 'none'",
+      "base-uri 'none'"
     ].join('; ')
   },
   {
@@ -51,12 +55,7 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config, { dev, isServer }) => {
-    // ✅ Disable eval-source-map for CSP safety
-    if (dev && !isServer) {
-      config.devtool = 'cheap-module-source-map'; // or 'source-map' for full mapping
-    }
-
+  webpack: (config) => {
     config.resolve = {
       ...config.resolve,
       alias: {
