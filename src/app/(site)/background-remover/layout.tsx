@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description:
       "Remove image backgrounds instantly with our AI-powered tool. No signup required.",
     url: "https://eraseto.com/background-remover",
-    siteName: "Eraseto",
+    siteName: "eraseto",
     images: [
       {
         url: "https://eraseto.com/og-image-background-remover.jpg", // use full URL to avoid misloading
