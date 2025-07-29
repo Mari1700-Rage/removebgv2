@@ -8,11 +8,11 @@ const securityHeaders = [
   {
     key: 'Content-Security-Policy',
     value: [
-      "default-src 'self'",
-      "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google 'unsafe-inline'",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https://*",
-      "connect-src 'self' https://* blob: data:",
+      "default-src 'self' https://eraseto.com",
+      "script-src 'self' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google 'unsafe-inline'",
+      "style-src 'self' https://eraseto.com 'unsafe-inline'",
+      "img-src 'self' https://eraseto.com data: https://*",
+      "connect-src 'self' https://eraseto.com https://* blob: data:",
       "worker-src 'self' blob:",
       "frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
       "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
