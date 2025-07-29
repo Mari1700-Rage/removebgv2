@@ -15,31 +15,36 @@ type Props = {
 
 export function ModalImage({ rowId }: Props) {
     const router = useRouter();
-    const name = useCell("images", rowId, "name") as string
-    const size = getSizeTrans(useCell("images", rowId, "size") as number)
-    const mediaType = useCell("images", rowId, "mediaType")
-    const imageUrl = useCell("images", rowId, "imageUrl") as string
-    const transformedImageUrl = useCell("images", rowId, "transformedImageUrl") as string
-    const height = useCell("images", rowId, "height")
-    const width = useCell("images", rowId, "width")
+    const name = useCell("images", rowId, "name");
+    const size = getSizeTrans(useCell("images", rowId, "size") as number);
+    const mediaType = useCell("images", rowId, "mediaType");
+    const imageUrl = useCell("images", rowId, "imageUrl") as string;
+    const transformedImageUrl = useCell("images", rowId, "transformedImageUrl") as string;
+    const height = useCell("images", rowId, "height");
+    const width = useCell("images", rowId, "width");
 
     const downloadPNG = async () => {
-        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '')
+        if (typeof name !== "string") {
+            toast.error("Invalid image name.");
+            return;
+        }
+        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '');
+
         const img = await new Promise<HTMLImageElement>((resolve) => {
-            const image = new Image()
-            image.src = transformedImageUrl || imageUrl
-            image.onload = () => resolve(image)
-        })
+            const image = new Image();
+            image.src = transformedImageUrl || imageUrl;
+            image.onload = () => resolve(image);
+        });
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = img.width
-        canvas.height = img.height
-        ctx?.drawImage(img, 0, 0)
-        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx?.drawImage(img, 0, 0);
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
         if (blob) {
-            saveAs(blob, `${filename}.png`)
+            saveAs(blob, `${filename}.png`);
         } else {
-            toast.error('Failed to generate image blob')
+            toast.error('Failed to generate image blob');
         }
     };
 
@@ -61,7 +66,7 @@ export function ModalImage({ rowId }: Props) {
             ${isExiting ? 'animate-out zoom-out-95 ease-in duration-200' : ''}
             `}
             >
-                <Dialog role="dialog" aria-label={name} className="relative outline-none">
+                <Dialog role="dialog" aria-label={typeof name === "string" ? name : "image"} className="relative outline-none">
                     {({ close }) => (
                         <>
                             <TransformWrapper>
@@ -70,7 +75,7 @@ export function ModalImage({ rowId }: Props) {
                                         <TransformComponent contentClass="max-w-[500px]" wrapperClass="self-center rounded-lg border border-accent">
                                             <NextImage
                                                 src={transformedImageUrl || imageUrl}
-                                                alt={name}
+                                                alt={typeof name === "string" ? name : "image"}
                                                 width={width}
                                                 height={height}
                                                 priority={true}
@@ -96,7 +101,7 @@ export function ModalImage({ rowId }: Props) {
                                         </div>
                                         <div className="flex flex-wrap items-center justify-between gap-3">
                                             <div className='flex-1'>
-                                                <h4 className="font-medium text-primary">{name}</h4>
+                                                <h4 className="font-medium text-primary">{typeof name === "string" ? name : "N/A"}</h4>
                                                 <p className="text-xs text-action">{width} x {height} | {mediaType} | {size}</p>
                                             </div>
                                             {transformedImageUrl &&
