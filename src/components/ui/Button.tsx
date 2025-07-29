@@ -28,6 +28,7 @@ const pushButton: Variants = {
     },
   },
 };
+
 const buttonVariants = cva(
   "inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50",
   {
@@ -63,17 +64,12 @@ export const Button = React.forwardRef(
         variants={pushButton}
         initial={false}
         animate={pressing ? "pressed" : "unpressed"}
-        transition={{ type: "spring", duration: 0.3, bounce: 0.5 }}
         onTapStart={() => {
           setPressing(true);
-          onStart;
+          onStart?.();
         }}
-        onTap={() => {
-          setPressing(false);
-        }}
-        onTapCancel={() => {
-          setPressing(false);
-        }}
+        onTap={() => setPressing(false)}
+        onTapCancel={() => setPressing(false)}
         className={cn(buttonVariants({ variant, className }))}
         {...props}
       />
@@ -81,5 +77,4 @@ export const Button = React.forwardRef(
   }
 );
 
-Button.displayName = "Button"
-
+Button.displayName = "Button";
