@@ -41,7 +41,7 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['eraseto.com'], // hostname only, no protocol
+    domains: ['eraseto.com'],
   },
   async headers() {
     return [
@@ -51,7 +51,12 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config) => {
+  webpack: (config, { dev, isServer }) => {
+    // ✅ Disable eval-source-map for CSP safety
+    if (dev && !isServer) {
+      config.devtool = 'cheap-module-source-map'; // or 'source-map' for full mapping
+    }
+
     config.resolve = {
       ...config.resolve,
       alias: {
