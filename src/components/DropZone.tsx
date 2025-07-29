@@ -130,5 +130,21 @@ export default function DropZone() {
         />
       </label>
 
-      <canvas ref={canvasRef} width={224} height={
+      <canvas ref={canvasRef} width={224} height={224} style={{ display: "none" }} />
 
+      {loading && <p className="text-blue-500">Removing background...</p>}
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+
+      {resultImage && (
+        <div className="mt-4">
+          <p className="font-semibold mb-2">Result:</p>
+          <img
+            src={resultImage}
+            alt="Processed"
+            className="rounded shadow max-w-full h-auto mx-auto"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
