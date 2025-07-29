@@ -70,7 +70,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <meta
           name="google-site-verification"
-          content="your-verification-code"
+          content="4619589162374260"
         />
 
         {/* ✅ Google AdSense script directly injected without `next/script` */}
