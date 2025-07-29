@@ -74,13 +74,22 @@ const nextConfig = {
       },
     };
 
-    config.module.rules.push({
-      test: /\.m?js$/,
-      type: 'javascript/auto',
-      resolve: {
-        fullySpecified: false,
+    config.module.rules.push(
+      {
+        test: /\.m?js$/,
+        type: 'javascript/auto',
+        resolve: {
+          fullySpecified: false,
+        },
       },
-    });
+      {
+        test: /ort\.node\.min\.mjs$/,
+        parser: {
+          amd: false,
+          commonjs: false,
+        },
+      }
+    );
 
     config.experiments = {
       asyncWebAssembly: true,
