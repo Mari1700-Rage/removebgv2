@@ -14,31 +14,39 @@ type Props = {
 }
 
 export default function ImageView({ rowId }: Props) {
-    const name = useCell("images", rowId, "name") as string
-    const imageUrl = useCell("images", rowId, "imageUrl") as string
-    const transformedImageUrl = useCell("images", rowId, "transformedImageUrl")
-    const size = getSizeTrans(useCell("images", rowId, "size") as number)
-    const height = useCell("images", rowId, "height")
-    const width = useCell("images", rowId, "width")
-    const mediaType = useCell("images", rowId, "mediaType")
+    const name = useCell("images", rowId, "name");
+    const imageUrl = useCell("images", rowId, "imageUrl") as string;
+    const transformedImageUrl = useCell("images", rowId, "transformedImageUrl");
+    const size = getSizeTrans(useCell("images", rowId, "size") as number);
+    const height = useCell("images", rowId, "height");
+    const width = useCell("images", rowId, "width");
+    const mediaType = useCell("images", rowId, "mediaType");
 
     const downloadPNG = async () => {
-        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '')
+        if (typeof name !== "string") {
+            toast.error("Invalid image name.");
+            return;
+        }
+        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '');
+
         const img = await new Promise<HTMLImageElement>((resolve) => {
             const image = new Image()
             image.src = transformedImageUrl || imageUrl
             image.onload = () => resolve(image)
         })
+
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = img.width
-        canvas.height = img.height
-        ctx?.drawImage(img, 0, 0)
-        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx?.drawImage(img, 0, 0);
+
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+
         if (blob) {
-            saveAs(blob, `${filename}.png`)
+            saveAs(blob, `${filename}.png`);
         } else {
-            toast.error('Failed to generate image blob')
+            toast.error('Failed to generate image blob');
         }
     };
 
@@ -51,7 +59,7 @@ export default function ImageView({ rowId }: Props) {
                             <TransformComponent wrapperClass="border border rounded-lg border border-accent">
                                 <NextImage
                                     src={transformedImageUrl || imageUrl}
-                                    alt={name}
+                                    alt={typeof name === "string" ? name : "image"}
                                     width={width}
                                     height={height}
                                     priority={true}
@@ -74,7 +82,7 @@ export default function ImageView({ rowId }: Props) {
             </div>
             <div className="grid grid-cols-2 gap-3 rounded-lg border border-accent p-2 text-primary md:grid-cols-[repeat(2,auto)]">
                 <p className="font-bold text-primary">Name:</p>
-                <p className="break-words text-secondary">{name}</p>
+                <p className="break-words text-secondary">{typeof name === "string" ? name : "N/A"}</p>
                 <hr className="col-span-full border border-accent" />
                 <p className="font-bold text-primary">Size:</p>
                 <p className="text-secondary">{size}</p>
@@ -94,9 +102,10 @@ export default function ImageView({ rowId }: Props) {
                     }
                 </div>
             </div>
-        </div>)
-        :
+        </div>
+    ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-2">
             <LuLoader2 className="size-10 animate-spin text-secondary" />
         </div>
+    );
 }
