@@ -13,12 +13,14 @@ export default function DropZone() {
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       setError(null);
       setResultImage(null);
-
       const file = event.target.files?.[0];
+
       if (!file || !file.type.startsWith("image/")) {
         setError("Please upload a valid image file.");
         return;
       }
+
+      console.log("Selected file:", file);
 
       const img = new Image();
       const imgURL = URL.createObjectURL(file);
@@ -27,10 +29,16 @@ export default function DropZone() {
       img.onload = async () => {
         setLoading(true);
         const canvas = canvasRef.current;
-        if (!canvas) return setError("Canvas not available.");
+        if (!canvas) {
+          setError("Canvas not available.");
+          return;
+        }
 
         const ctx = canvas.getContext("2d");
-        if (!ctx) return setError("Canvas context not found.");
+        if (!ctx) {
+          setError("Canvas context not found.");
+          return;
+        }
 
         const originalWidth = img.width;
         const originalHeight = img.height;
@@ -41,6 +49,7 @@ export default function DropZone() {
 
         const imageData = ctx.getImageData(0, 0, 224, 224).data;
         const floatArray = new Float32Array(224 * 224 * 3);
+
         for (let i = 0; i < 224 * 224; i++) {
           floatArray[i * 3 + 0] = imageData[i * 4 + 0] / 255;
           floatArray[i * 3 + 1] = imageData[i * 4 + 1] / 255;
@@ -49,19 +58,12 @@ export default function DropZone() {
 
         try {
           const session = await ort.InferenceSession.create("/model.onnx");
-
-          const inputName = session.inputNames?.[0];
-          const outputName = session.outputNames?.[0];
-
-          if (typeof inputName !== "string" || typeof outputName !== "string") {
-            throw new Error("Model input or output name is invalid.");
-          }
-
+          console.log("ONNX model loaded:", session);
           const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
-          const feeds = { [inputName]: inputTensor };
-          const output = await session.run(feeds);
+          const feeds = { [session.inputNames[0]]: inputTensor };
 
-          const mask = output[outputName].data as Float32Array;
+          const output = await session.run(feeds);
+          const mask = output[session.outputNames[0]].data as Float32Array;
 
           const outputCanvas = document.createElement("canvas");
           outputCanvas.width = originalWidth;
@@ -93,19 +95,14 @@ export default function DropZone() {
               const resultURL = URL.createObjectURL(blob);
               setResultImage(resultURL);
               console.log("Result image URL:", resultURL);
-            } else {
-              setError("Failed to generate image blob.");
             }
             setLoading(false);
             URL.revokeObjectURL(imgURL);
-          }, "image/png");
-        } catch (err: any) {
+          });
+        } catch (err) {
           console.error("ONNX inference error:", err);
-          setError(
-            "Failed to process image. Please ensure the ONNX model is correctly hosted at /model.onnx."
-          );
+          setError("Failed to process image. Make sure the model is available at /model.onnx.");
           setLoading(false);
-          URL.revokeObjectURL(imgURL);
         }
       };
 
@@ -130,7 +127,12 @@ export default function DropZone() {
         />
       </label>
 
-      <canvas ref={canvasRef} width={224} height={224} style={{ display: "none" }} />
+      <canvas
+        ref={canvasRef}
+        width={224}
+        height={224}
+        style={{ display: "none" }}
+      />
 
       {loading && <p className="text-blue-500">Removing background...</p>}
       {error && <p className="text-red-500 mt-2">{error}</p>}
