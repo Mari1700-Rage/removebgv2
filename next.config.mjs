@@ -18,8 +18,8 @@ const securityHeaders = [
       "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
       "script-src-attr 'none'",
       "object-src 'none'",
-      "base-uri 'none'",
-    ].join('; '),
+      "base-uri 'none'"
+    ].join('; ')
   },
   {
     key: 'Referrer-Policy',
