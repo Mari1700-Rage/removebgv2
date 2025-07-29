@@ -9,10 +9,10 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google",
+      "script-src 'self' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google",
       "style-src 'self' 'unsafe-inline'",
       "img-src * data:",
-      "connect-src * https://ep2.adtrafficquality.google",
+      "connect-src 'self' blob: data: https://ep2.adtrafficquality.google",
       "worker-src 'self' blob:",
       "frame-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
       "child-src https://*.doubleclick.net https://*.google.com https://*.googlesyndication.com",
@@ -57,7 +57,7 @@ const nextConfig = {
   },
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
-      config.devtool = 'cheap-module-source-map'; // CSP safe devtool
+      config.devtool = 'cheap-module-source-map';
     }
 
     config.resolve = {
