@@ -11,21 +11,30 @@ import { toast } from "sonner";
 
 type Props = {
     rowId: string
-}
+};
 
 export function ModalImage({ rowId }: Props) {
     const router = useRouter();
-    const name = useCell("images", rowId, "name") as string;
-    const size = getSizeTrans(useCell("images", rowId, "size") as number);
-    const mediaType = useCell("images", rowId, "mediaType");
-    const imageUrl = useCell("images", rowId, "imageUrl") as string;
-    const transformedImageUrl = useCell("images", rowId, "transformedImageUrl") as string;
-    const height = useCell("images", rowId, "height");
-    const width = useCell("images", rowId, "width");
+
+    const rawName = useCell("images", rowId, "name");
+    const name = typeof rawName === 'string' ? rawName : 'image';
+
+    const rawSize = useCell("images", rowId, "size");
+    const size = typeof rawSize === 'number' ? getSizeTrans(rawSize) : 'unknown';
+
+    const mediaType = useCell("images", rowId, "mediaType") ?? 'image/png';
+
+    const rawImageUrl = useCell("images", rowId, "imageUrl");
+    const imageUrl = typeof rawImageUrl === 'string' ? rawImageUrl : '';
+
+    const rawTransformedUrl = useCell("images", rowId, "transformedImageUrl");
+    const transformedImageUrl = typeof rawTransformedUrl === 'string' ? rawTransformedUrl : '';
+
+    const height = typeof useCell("images", rowId, "height") === 'number' ? useCell("images", rowId, "height") : 400;
+    const width = typeof useCell("images", rowId, "width") === 'number' ? useCell("images", rowId, "width") : 400;
 
     const downloadPNG = async () => {
-        // Defensive cast to string to ensure .replace is available
-        const filename = String(name).replace(/\.(png|jpg|jpeg|gif)$/i, '');
+        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '');
         const img = await new Promise<HTMLImageElement>((resolve) => {
             const image = new Image();
             image.src = transformedImageUrl || imageUrl;
