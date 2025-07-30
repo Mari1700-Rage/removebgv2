@@ -17,21 +17,20 @@ export function ModalImage({ rowId }: Props) {
     const router = useRouter();
 
     const rawName = useCell("images", rowId, "name");
-    const name = typeof rawName === 'string' ? rawName : 'image';
-
     const rawSize = useCell("images", rowId, "size");
-    const size = typeof rawSize === 'number' ? getSizeTrans(rawSize) : 'unknown';
-
-    const mediaType = useCell("images", rowId, "mediaType") ?? 'image/png';
-
+    const rawMediaType = useCell("images", rowId, "mediaType");
     const rawImageUrl = useCell("images", rowId, "imageUrl");
-    const imageUrl = typeof rawImageUrl === 'string' ? rawImageUrl : '';
-
     const rawTransformedUrl = useCell("images", rowId, "transformedImageUrl");
-    const transformedImageUrl = typeof rawTransformedUrl === 'string' ? rawTransformedUrl : '';
+    const rawHeight = useCell("images", rowId, "height");
+    const rawWidth = useCell("images", rowId, "width");
 
-    const height = typeof useCell("images", rowId, "height") === 'number' ? useCell("images", rowId, "height") : 400;
-    const width = typeof useCell("images", rowId, "width") === 'number' ? useCell("images", rowId, "width") : 400;
+    const name = typeof rawName === 'string' ? rawName : 'image';
+    const size = typeof rawSize === 'number' ? getSizeTrans(rawSize) : 'unknown';
+    const mediaType = typeof rawMediaType === 'string' ? rawMediaType : 'image/png';
+    const imageUrl = typeof rawImageUrl === 'string' ? rawImageUrl : '';
+    const transformedImageUrl = typeof rawTransformedUrl === 'string' ? rawTransformedUrl : '';
+    const height = typeof rawHeight === 'number' ? rawHeight : 400;
+    const width = typeof rawWidth === 'number' ? rawWidth : 400;
 
     const downloadPNG = async () => {
         const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '');
