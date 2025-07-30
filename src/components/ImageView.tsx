@@ -23,17 +23,11 @@ export default function ImageView({ rowId }: Props) {
     const mediaType = useCell("images", rowId, "mediaType")
 
     const downloadPNG = async () => {
-        const safeName = typeof name === "string" ? name : "image"
-        const filename = safeName.replace(/\.(png|jpg|jpeg|gif)$/i, '')
-        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '')
+        const img = await new Promise<HTMLImageElement>((resolve) => {
             const image = new Image()
-            image.crossOrigin = 'anonymous'  // Added to help with CORS for canvas
             image.src = transformedImageUrl || imageUrl
             image.onload = () => resolve(image)
-            image.onerror = () => {
-                toast.error('Failed to load image for download')
-                reject(new Error('Image load error'))
-            }
         })
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -64,13 +58,13 @@ export default function ImageView({ rowId }: Props) {
                                 />
                             </TransformComponent>
                             <div className="absolute inset-x-0 bottom-0 grid grid-cols-3 content-center bg-background/80 p-2 opacity-100 transition-opacity group-hover:opacity-100 md:opacity-0">
-                                <Button type='button' aria-label="Zoom In" className='text-secondary' onClick={() => zoomIn()}>
+                                <Button type='button' className='text-secondary' onClick={() => zoomIn()}>
                                     <LuZoomIn className="size-4" />
                                 </Button>
-                                <Button type='button' aria-label="Zoom Out" className='text-secondary' onClick={() => zoomOut()}>
+                                <Button type='button' className='text-secondary' onClick={() => zoomOut()}>
                                     <LuZoomOut className="size-4" />
                                 </Button>
-                                <Button type='button' aria-label="Reset Zoom" className='text-secondary' onClick={() => resetTransform()}>
+                                <Button type='button' className='text-secondary' onClick={() => resetTransform()}>
                                     <LuRefreshCcw className="size-4" />
                                 </Button>
                             </div>
@@ -100,7 +94,8 @@ export default function ImageView({ rowId }: Props) {
                     }
                 </div>
             </div>
-        </div>) :
+        </div>)
+        :
         <div className="flex flex-1 flex-col items-center justify-center gap-2">
             <LuLoader2 className="size-10 animate-spin text-secondary" />
         </div>
