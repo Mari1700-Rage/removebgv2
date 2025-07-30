@@ -12,7 +12,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://eraseto.com https://ep1.adtrafficquality.google 'unsafe-inline';",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
       "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net;",
-      "connect-src 'self' https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net;",
+      "connect-src 'self' https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gda&tv=r20250728&st=env;",
       "font-src 'self' https://fonts.gstatic.com;",
       "frame-src https://www.google.com https://eraseto.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;",
       "object-src 'none';",
