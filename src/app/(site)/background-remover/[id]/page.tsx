@@ -15,13 +15,11 @@ interface Props {
   };
 }
 
-import ImageDetailsClient from "@/components/ImageDetailsClient";
-
-export default function ImageDetailsPage({ params: { id } }: Props) {
+export default function page({ params: { id } }: Props) {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Image Details</h1>
-      <ImageDetailsClient id={id} />
+      <p>This page will be populated with client-side data for ID: {id}</p>
     </div>
   );
-}
+} 
