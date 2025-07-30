@@ -9,7 +9,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      "script-src 'self' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://eraseto.com https://ep1.adtrafficquality.google 'unsafe-inline';",
+      "script-src 'self' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://eraseto.com https://ep1.adtrafficquality.google https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gda&tv=r20250728&st=env 'unsafe-inline';",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
       "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net;",
       "connect-src 'self' https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gda&tv=r20250728&st=env;",
