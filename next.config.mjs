@@ -56,7 +56,7 @@ const nextConfig = {
   },
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
-      config.devtool = 'cheap-module-source-map'; // CSP safe devtool
+      config.devtool = 'cheap-module-source-map';
     }
 
     config.resolve = {
@@ -65,6 +65,7 @@ const nextConfig = {
         ...config.resolve.alias,
         sharp$: false,
         'onnxruntime-node$': false,
+        'onnxruntime-web/dist/ort.node.min.mjs': false, // Prevent bundling Node version
       },
       fallback: {
         fs: false,
@@ -80,6 +81,14 @@ const nextConfig = {
         fullySpecified: false,
       },
     });
+
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      {
+        module: /onnxruntime-web[\\/]dist[\\/]ort\.node\.min\.mjs/,
+        message: /Critical dependency: require function/,
+      },
+    ];
 
     config.experiments = {
       asyncWebAssembly: true,
