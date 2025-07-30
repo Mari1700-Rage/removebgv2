@@ -7,12 +7,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getSizeTrans(fs: number): string {
 	if (fs < 1024) {
-		return String(fs);
+		return `${fs} B`;
 	} else if (fs < 1024 * 1024) {
-		return parseInt(String((fs * 10) / 1024)) / 10 + " KB";
+		return `${(fs / 1024).toFixed(1)} KB`;
 	} else if (fs < 1024 * 1024 * 1024) {
-		return parseInt(String((fs * 10) / 1024 / 1024)) / 10 + " MB";
+		return `${(fs / (1024 * 1024)).toFixed(1)} MB`;
 	} else {
-		return parseInt(String((fs * 10) / 1024 / 1024 / 1024)) / 10 + " GB";
-	}
+		return `${(fs / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+	
 }
