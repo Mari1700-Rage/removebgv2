@@ -19,7 +19,7 @@ const nextConfig = {
     unoptimized: true,
     domains: [
       // Replace with your deployed domain (Vercel domain or custom domain)
-      'your-vercel-project.vercel.app',
+      'eraseto.com',
     ],
   },
 
