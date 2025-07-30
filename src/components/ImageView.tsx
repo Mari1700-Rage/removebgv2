@@ -23,7 +23,8 @@ export default function ImageView({ rowId }: Props) {
     const mediaType = useCell("images", rowId, "mediaType")
 
     const downloadPNG = async () => {
-        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '')
+        const safeName = typeof name === "string" ? name : "image"
+        const filename = safeName.replace(/\.(png|jpg|jpeg|gif)$/i, '')
         const img = await new Promise<HTMLImageElement>((resolve, reject) => {
             const image = new Image()
             image.crossOrigin = 'anonymous'  // Added to help with CORS for canvas
