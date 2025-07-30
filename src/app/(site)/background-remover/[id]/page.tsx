@@ -1,4 +1,6 @@
+// app/image/[id]/page.tsx
 import { Metadata } from "next";
+import ImageDetailsClient from "@/components/ImageDetailsClient";
 
 export const metadata: Metadata = {
   title: "Image Details - AI Background Remover",
@@ -15,11 +17,11 @@ interface Props {
   };
 }
 
-export default function page({ params: { id } }: Props) {
+export default function ImageDetailsPage({ params: { id } }: Props) {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Image Details</h1>
-      <p>This page will be populated with client-side data for ID: {id}</p>
+      <ImageDetailsClient id={id} />
     </div>
   );
-} 
+}
