@@ -32,6 +32,7 @@ const backgroundImages: BackgroundImage[] = [
   { id: "15", src: "/background/15-min.jpg", alt: "Background 15" },
   { id: "16", src: "/background/16-min.jpg", alt: "Background 16" },
   { id: "17", src: "/background/17-min.jpg", alt: "Background 17" },
+    { id: "18", src: "/background/18-min.jpg", alt: "Background 18" },
 ]
 
 const ITEMS_PER_PAGE = 5
