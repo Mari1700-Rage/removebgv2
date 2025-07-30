@@ -11,44 +11,35 @@ import { toast } from "sonner";
 
 type Props = {
     rowId: string
-};
+}
 
 export function ModalImage({ rowId }: Props) {
     const router = useRouter();
-
-    const rawName = useCell("images", rowId, "name");
-    const rawSize = useCell("images", rowId, "size");
-    const rawMediaType = useCell("images", rowId, "mediaType");
-    const rawImageUrl = useCell("images", rowId, "imageUrl");
-    const rawTransformedUrl = useCell("images", rowId, "transformedImageUrl");
-    const rawHeight = useCell("images", rowId, "height");
-    const rawWidth = useCell("images", rowId, "width");
-
-    const name = typeof rawName === 'string' ? rawName : 'image';
-    const size = typeof rawSize === 'number' ? getSizeTrans(rawSize) : 'unknown';
-    const mediaType = typeof rawMediaType === 'string' ? rawMediaType : 'image/png';
-    const imageUrl = typeof rawImageUrl === 'string' ? rawImageUrl : '';
-    const transformedImageUrl = typeof rawTransformedUrl === 'string' ? rawTransformedUrl : '';
-    const height = typeof rawHeight === 'number' ? rawHeight : 400;
-    const width = typeof rawWidth === 'number' ? rawWidth : 400;
+    const name = useCell("images", rowId, "name") as string
+    const size = getSizeTrans(useCell("images", rowId, "size") as number)
+    const mediaType = useCell("images", rowId, "mediaType")
+    const imageUrl = useCell("images", rowId, "imageUrl") as string
+    const transformedImageUrl = useCell("images", rowId, "transformedImageUrl") as string
+    const height = useCell("images", rowId, "height")
+    const width = useCell("images", rowId, "width")
 
     const downloadPNG = async () => {
-        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '');
+        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '')
         const img = await new Promise<HTMLImageElement>((resolve) => {
-            const image = new Image();
-            image.src = transformedImageUrl || imageUrl;
-            image.onload = () => resolve(image);
-        });
+            const image = new Image()
+            image.src = transformedImageUrl || imageUrl
+            image.onload = () => resolve(image)
+        })
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx?.drawImage(img, 0, 0);
-        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx?.drawImage(img, 0, 0)
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
         if (blob) {
-            saveAs(blob, `${filename}.png`);
+            saveAs(blob, `${filename}.png`)
         } else {
-            toast.error('Failed to generate image blob');
+            toast.error('Failed to generate image blob')
         }
     };
 
@@ -130,5 +121,5 @@ export function ModalImage({ rowId }: Props) {
                 </Dialog>
             </Modal>
         </ModalOverlay>
-    );
+    )
 }
