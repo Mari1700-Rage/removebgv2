@@ -14,5 +14,5 @@ export function getSizeTrans(fs: number): string {
 		return `${(fs / (1024 * 1024)).toFixed(1)} MB`;
 	} else {
 		return `${(fs / (1024 * 1024 * 1024)).toFixed(1)} GB`;
-	
+	}
 }
