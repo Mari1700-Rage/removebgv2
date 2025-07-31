@@ -2,6 +2,7 @@
   "name": "eraseto",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev && tsc --noEmit",
     "build": "next build",
@@ -21,6 +22,7 @@
     "jszip": "^3.10.1",
     "next": "14.2.8",
     "next-themes": "^0.3.0",
+    "onnxruntime-web": "^1.22.0",
     "react": "^18",
     "react-aria-components": "^1.3.3",
     "react-dom": "^18",
