@@ -33,11 +33,10 @@ function LoadingDropZone() {
   );
 }
 
-import dynamic from "next/dynamic";
-
+// Dynamically load DropZone component without SSR
 const DropZone = dynamic(() => import("@/components/DropZone"), {
   ssr: false,
-  loading: () => <div>Loading DropZone...</div>,
+  loading: () => <LoadingDropZone />,
 });
 
 export default function BackgroundRemoverPage() {
