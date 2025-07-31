@@ -1,30 +1,37 @@
-import https from 'https';
 import fs from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+
+const streamPipeline = promisify(pipeline);
 
 const FILE_ID = '10qIvh0dehhlTc5tg8DJZbF3Qt5LuCocg';
-const DEST_PATH = './model.onnx';
-const url = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
+const baseUrl = 'https://drive.google.com/uc?export=download';
+const destPath = path.join(process.cwd(), 'public', 'model.onnx');
 
-const file = fs.createWriteStream(DEST_PATH);
+async function downloadFile() {
+  console.log('⏳ Fetching confirmation token from Google Drive...');
+  const initialRes = await fetch(`${baseUrl}&id=${FILE_ID}`, { method: 'GET' });
+  const html = await initialRes.text();
 
-https.get(url, (response) => {
-  // Google Drive sometimes sends a redirect for large files, handle it:
-  if (response.headers.location) {
-    https.get(response.headers.location, (redirectedResponse) => {
-      redirectedResponse.pipe(file);
-      file.on('finish', () => {
-        file.close();
-        console.log('Downloaded model.onnx');
-      });
-    });
-  } else {
-    response.pipe(file);
-    file.on('finish', () => {
-      file.close();
-      console.log('Downloaded model.onnx');
-    });
+  const confirmMatch = html.match(/confirm=([0-9A-Za-z_]+)&amp;id=/);
+  if (!confirmMatch) {
+    throw new Error('❌ Could not find confirmation token. Google may have changed the page format.');
   }
-}).on('error', (err) => {
-  fs.unlink(DEST_PATH, () => {});
-  console.error('Error downloading file:', err.message);
+
+  const confirmToken = confirmMatch[1];
+  const finalUrl = `${baseUrl}&confirm=${confirmToken}&id=${FILE_ID}`;
+
+  console.log('⬇️ Downloading model.onnx...');
+
+  const downloadRes = await fetch(finalUrl);
+  if (!downloadRes.ok) throw new Error(`Download failed: ${downloadRes.statusText}`);
+
+  await streamPipeline(downloadRes.body, fs.createWriteStream(destPath));
+  console.log('✅ model.onnx downloaded to public/');
+}
+
+downloadFile().catch(err => {
+  console.error('Download failed:', err.message);
 });
