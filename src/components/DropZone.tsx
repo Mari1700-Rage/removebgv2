@@ -47,40 +47,33 @@ export default function DropZone() {
 
         const imageData = ctx.getImageData(0, 0, 224, 224).data;
         const floatArray = new Float32Array(224 * 224 * 3);
-
         for (let i = 0; i < 224 * 224; i++) {
           floatArray[i * 3 + 0] = imageData[i * 4 + 0] / 255;
           floatArray[i * 3 + 1] = imageData[i * 4 + 1] / 255;
           floatArray[i * 3 + 2] = imageData[i * 4 + 2] / 255;
         }
 
-        let session;
         try {
-          session = await ort.InferenceSession.create("/model.onnx");
+          const session = await ort.InferenceSession.create("/model.onnx");
           console.log("ONNX model loaded:", session);
-        } catch (e) {
-          console.error("Session creation failed:", e);
-          setError("Failed to load ONNX model.");
-          setLoading(false);
-          return;
-        }
 
-        const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
-        const feeds = { [session.inputNames[0]]: inputTensor };
+          const inputName = session.inputNames?.[0];
+          const outputName = session.outputNames?.[0];
 
-        let output;
-        try {
-          output = await session.run(feeds);
+          console.log("Input name:", inputName);
+          console.log("Output name:", outputName);
+
+          if (typeof inputName !== "string" || typeof outputName !== "string") {
+            throw new Error("Invalid model I/O names.");
+          }
+
+          const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
+          const feeds = { [inputName]: inputTensor };
+
+          const output = await session.run(feeds);
           console.log("ONNX output:", output);
-        } catch (e) {
-          console.error("ONNX run error:", e);
-          setError("ONNX inference failed.");
-          setLoading(false);
-          return;
-        }
 
-        try {
-          const mask = output[session.outputNames[0]].data as Float32Array;
+          const mask = output[outputName].data as Float32Array;
 
           const outputCanvas = document.createElement("canvas");
           outputCanvas.width = originalWidth;
@@ -117,8 +110,8 @@ export default function DropZone() {
             URL.revokeObjectURL(imgURL);
           });
         } catch (e) {
-          console.error("Post-processing error:", e);
-          setError("Failed to render output.");
+          console.error("Processing error:", e);
+          setError("Failed to load or run ONNX model.");
           setLoading(false);
         }
       };
