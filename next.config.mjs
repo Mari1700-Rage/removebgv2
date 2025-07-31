@@ -1,5 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import webpack from 'webpack'; // ✅ Needed for ContextReplacementPlugin
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,9 +66,10 @@ const nextConfig = {
         ...config.resolve.alias,
         sharp$: false,
         'onnxruntime-node$': false,
-        'onnxruntime-web/dist/ort.node.min.mjs': false, // Prevent bundling Node version
+        'onnxruntime-web/dist/ort.node.min.mjs': false,
       },
       fallback: {
+        ...config.resolve.fallback,
         fs: false,
         path: false,
         crypto: false,
@@ -89,6 +91,14 @@ const nextConfig = {
         message: /Critical dependency: require function/,
       },
     ];
+
+    // ✅ Fix critical dependency with ContextReplacementPlugin
+    config.plugins.push(
+      new webpack.ContextReplacementPlugin(
+        /onnxruntime-web[\\/]dist/,
+        path.resolve('./node_modules/onnxruntime-web/dist')
+      )
+    );
 
     config.experiments = {
       asyncWebAssembly: true,
