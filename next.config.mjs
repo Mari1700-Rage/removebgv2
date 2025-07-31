@@ -55,10 +55,8 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      config.devtool = 'cheap-module-source-map';
-    }
+  webpack: (config, { isServer }) => {
+    // Removed devtool override to avoid errors
 
     config.resolve = {
       ...config.resolve,
@@ -92,7 +90,6 @@ const nextConfig = {
       },
     ];
 
-    // ✅ Fix critical dependency with ContextReplacementPlugin
     config.plugins.push(
       new webpack.ContextReplacementPlugin(
         /onnxruntime-web[\\/]dist/,
