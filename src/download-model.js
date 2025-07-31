@@ -2,7 +2,7 @@ import https from 'https';
 import fs from 'fs';
 
 const url = 'https://www.dropbox.com/scl/fi/xr24prgkhvqgin0gqkz4l/model.onnx?rlkey=kqnx19vlbbqz5hypxzuyxxbow&st=3kyuqn5e&dl=1';
-const DEST_PATH = './model.onnx';
+const DEST_PATH = '../public/model.onnx';
 
 const file = fs.createWriteStream(DEST_PATH);
 
