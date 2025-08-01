@@ -54,7 +54,7 @@ export default function DropZone() {
         }
 
         try {
-          const session = await ort.InferenceSession.create("public/model.onnx");
+          const session = await ort.InferenceSession.create("/model.onnx");
           console.log("ONNX model loaded:", session);
 
           const inputName = session.inputNames?.[0];
