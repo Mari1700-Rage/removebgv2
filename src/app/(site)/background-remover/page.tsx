@@ -1,171 +1,112 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
+import React, { useState, useRef } from "react";
+import { pipeline } from "@huggingface/transformers";
 
-// Lazy-load HowTo and DropZone components
-const HowTo = dynamic(() => import("@/components/HowTo"), { ssr: false });
+export default function BackgroundRemover() {
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-function LoadingDropZone() {
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const removeBackground = async (file: File) => {
+    setLoading(true);
 
-  useEffect(() => setMounted(true), []);
-
-  const currentTheme = mounted ? resolvedTheme || theme : "light";
-
-  return (
-    <div
-      className={`w-full h-[300px] border-2 border-dashed ${
-        currentTheme === "light"
-          ? "border-gray-300 bg-gray-100/50"
-          : "border-gray-600 bg-gray-800/30"
-      } rounded-xl flex items-center justify-center`}
-    >
-      <div
-        className={`animate-pulse ${
-          currentTheme === "light" ? "text-gray-500" : "text-gray-300"
-        }`}
-      >
-        Loading background remover...
-      </div>
-    </div>
-  );
-}
-
-const DropZone = dynamic(() => import("@/components/DropZone"), {
-  ssr: false,
-  loading: () => <LoadingDropZone />,
-});
-
-export default function BackgroundRemoverPage() {
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [isBrowserSupported, setIsBrowserSupported] = useState(true);
-
-  useEffect(() => {
-    setMounted(true);
-
-    // WebGL check
     try {
-      const canvas = document.createElement("canvas");
-      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-      if (!gl) setIsBrowserSupported(false);
-    } catch {
-      setIsBrowserSupported(false);
+      const bgRemoval = await pipeline("image-segmentation", "briaai/RMBG-1.4");
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        if (typeof reader.result === "string") {
+          const img = new Image();
+          img.crossOrigin = "anonymous"; // Avoid CORS issues
+          img.src = reader.result;
+
+          img.onload = async () => {
+            // Run segmentation on the data URL image
+            const segmentation = await bgRemoval(reader.result);
+
+            /*
+              segmentation output looks like:
+              [
+                {
+                  label: "foreground",
+                  mask: [0,1,1,0,...] // binary or float mask array flattened
+                  width: number,
+                  height: number,
+                  // sometimes probability mask per pixel
+                }
+              ]
+            */
+
+            // Prepare canvas
+            const canvas = canvasRef.current!;
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d")!;
+            ctx.drawImage(img, 0, 0);
+
+            // Extract mask info from segmentation result
+            const maskData = segmentation[0].mask;
+            const maskWidth = segmentation[0].width;
+            const maskHeight = segmentation[0].height;
+
+            // Get image data to modify alpha channel
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // Resize or scale mask to image size if necessary
+            // (Assuming mask and image sizes are equal here; if not, you may need to scale)
+
+            // Apply mask: make background pixels transparent
+            for (let y = 0; y < maskHeight; y++) {
+              for (let x = 0; x < maskWidth; x++) {
+                const maskIndex = y * maskWidth + x;
+                const alphaIndex = (y * canvas.width + x) * 4 + 3;
+
+                // If mask pixel is background (0), set alpha to 0 (transparent)
+                // If mask pixel is foreground (1), keep alpha 255 (opaque)
+                if (maskData[maskIndex] < 0.5) {
+                  data[alphaIndex] = 0;
+                }
+              }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+
+            // Convert canvas to image URL
+            const outputUrl = canvas.toDataURL("image/png");
+            setResultUrl(outputUrl);
+            setLoading(false);
+          };
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error removing background:", error);
+      setLoading(false);
     }
+  };
 
-    // Optional WebGPU check
-    if (!("gpu" in navigator)) {
-      console.info("WebGPU not available — fallback to CPU if possible.");
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+      removeBackground(e.target.files[0]);
     }
-
-    // Load Google AdSense
-    const script = document.createElement("script");
-    script.src =
-      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4619589162374260";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
-
-  const currentTheme = mounted ? resolvedTheme || theme : "light";
+  };
 
   return (
-    <div
-      className={`min-h-screen ${
-        currentTheme === "light" ? "bg-gray-50 text-gray-900" : "bg-gray-900 text-white"
-      } py-16`}
-    >
-      <div className="container mx-auto max-w-6xl px-4">
-        {/* Badge */}
-        <div className="max-w-3xl mx-auto mb-8">
-          <div className="flex justify-center mb-6">
-            <div
-              className={`inline-flex items-center gap-2 ${
-                currentTheme === "light"
-                  ? "bg-white border border-gray-200 shadow-sm"
-                  : "bg-gray-800 border border-gray-700 shadow-sm"
-              } rounded-2xl px-4 py-2 text-sm`}
-            >
-              <span className="text-orange-400 text-lg">🏆</span>
-              <span
-                className={`font-medium ${
-                  currentTheme === "light" ? "text-gray-900" : "text-white"
-                }`}
-              >
-                #1 Product of the Day
-              </span>
-              <span
-                className={`text-xs ${
-                  currentTheme === "light" ? "text-gray-600" : "text-gray-400"
-                } ml-1`}
-              >
-                Editors' Choice
-              </span>
-            </div>
-          </div>
-
-          {/* Header */}
-          <div className="text-center">
-            <h1
-              className={`text-4xl md:text-5xl font-bold mb-4 leading-tight ${
-                currentTheme === "light" ? "text-gray-900" : "text-white"
-              }`}
-            >
-              Remove Background From Images Instantly
-            </h1>
-            <p
-              className={`text-lg ${
-                currentTheme === "light" ? "text-gray-600" : "text-gray-300"
-              } mb-8 max-w-2xl mx-auto`}
-            >
-              Transform your images with AI-powered background removal. Achieve professional results in seconds.
-            </p>
-          </div>
+    <div>
+      <h1>Background Remover with Hugging Face RMBG-1.4</h1>
+      <input type="file" accept="image/*" onChange={onFileChange} />
+      {loading && <p>Removing background...</p>}
+      {resultUrl && (
+        <div>
+          <h2>Result</h2>
+          <img src={resultUrl} alt="Result" style={{ maxWidth: "400px" }} />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
         </div>
-
-        {/* DropZone */}
-        <div className="mb-12">
-          {isBrowserSupported ? (
-            <DropZone />
-          ) : (
-            <div
-              className={`w-full h-[300px] border-2 border-dashed ${
-                currentTheme === "light"
-                  ? "border-red-300 bg-red-100/50 text-red-800"
-                  : "border-red-600 bg-red-800/30 text-red-200"
-              } rounded-2xl flex items-center justify-center text-center p-4`}
-            >
-              <div>
-                <p className="font-semibold mb-2">⚠️ Your browser is not supported</p>
-                <p className="text-sm">
-                  Background removal requires WebGL, which is not available in your browser.
-                  Please switch to <strong>Chrome</strong> or <strong>Edge</strong> for the best experience.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* HowTo Section */}
-        <div
-          className={`${
-            currentTheme === "light"
-              ? "bg-white border border-gray-200 shadow-sm"
-              : "bg-gray-800 border border-gray-700 shadow-sm"
-          } rounded-2xl p-8`}
-        >
-          <HowTo variant={currentTheme === "light" ? "light" : "dark"} />
-        </div>
-      </div>
+      )}
     </div>
   );
 }
