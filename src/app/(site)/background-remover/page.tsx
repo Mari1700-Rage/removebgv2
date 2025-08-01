@@ -1,9 +1,11 @@
-"use client"
+"use client";
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import HowTo from "@/components/HowTo";
+
+// Lazy-load HowTo (optional: remove `dynamic()` if you prefer SSR)
+const HowTo = dynamic(() => import("@/components/HowTo"), { ssr: false });
 
 // Fallback DropZone loading state
 function LoadingDropZone() {
@@ -47,16 +49,22 @@ export default function BackgroundRemoverPage() {
   useEffect(() => {
     setMounted(true);
 
-    // Feature detection for WebGL/WebGPU
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    const hasWebGPU = "gpu" in navigator;
+    // Feature detection for WebGL
+    let gl = null;
+    try {
+      const canvas = document.createElement("canvas");
+      gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    } catch (err) {
+      console.warn("Error checking WebGL support:", err);
+    }
 
     if (!gl) {
       console.warn("WebGL not supported — this browser may not work.");
       setIsBrowserSupported(false);
     }
 
+    // Optional: WebGPU info
+    const hasWebGPU = "gpu" in navigator;
     if (!hasWebGPU) {
       console.info("WebGPU not available — falling back to CPU if possible.");
     }
@@ -70,7 +78,9 @@ export default function BackgroundRemoverPage() {
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
