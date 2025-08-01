@@ -1,110 +1,139 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { pipeline } from "@huggingface/transformers";
+import { useState, useEffect, useRef } from "react";
 
-export default function BackgroundRemover() {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [resultUrl, setResultUrl] = useState<string | null>(null);
+export default function BackgroundRemoverPage() {
+  const [pipeline, setPipeline] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [resultImage, setResultImage] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const removeBackground = async (file: File) => {
+  // Load the Hugging Face pipeline dynamically on client
+  useEffect(() => {
+    (async () => {
+      try {
+        const { pipeline } = await import("@huggingface/transformers");
+        const bgRemoval = await pipeline("image-segmentation", "briaai/RMBG-1.4");
+        setPipeline(() => bgRemoval);
+      } catch (e) {
+        console.error("Failed to load HF pipeline:", e);
+        setError("Failed to load background removal model.");
+      }
+    })();
+  }, []);
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    setResultImage(null);
+    const file = event.target.files?.[0];
+    if (!file || !file.type.startsWith("image/")) {
+      setError("Please upload a valid image file.");
+      return;
+    }
+    if (!pipeline) {
+      setError("Model is not loaded yet. Please wait.");
+      return;
+    }
+
     setLoading(true);
 
-    try {
-      const bgRemoval = await pipeline("image-segmentation", "briaai/RMBG-1.4");
+    const reader = new FileReader();
+    reader.onload = async () => {
+      if (typeof reader.result !== "string") {
+        setError("Failed to read the image file.");
+        setLoading(false);
+        return;
+      }
 
-      const reader = new FileReader();
-      reader.onload = async () => {
-        if (typeof reader.result === "string") {
-          const img = new Image();
-          img.crossOrigin = "anonymous"; // Avoid CORS issues
-          img.src = reader.result;
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // prevent CORS issues
+      img.src = reader.result;
 
-          img.onload = async () => {
-            // Run segmentation on the data URL image
-            const segmentation = await bgRemoval(reader.result);
+      img.onload = async () => {
+        try {
+          const segmentation = await pipeline(reader.result);
 
-            /*
-              segmentation output looks like:
-              [
-                {
-                  label: "foreground",
-                  mask: [0,1,1,0,...] // binary or float mask array flattened
-                  width: number,
-                  height: number,
-                  // sometimes probability mask per pixel
-                }
-              ]
-            */
+          if (!canvasRef.current) {
+            setError("Canvas not available.");
+            setLoading(false);
+            return;
+          }
 
-            // Prepare canvas
-            const canvas = canvasRef.current!;
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext("2d")!;
-            ctx.drawImage(img, 0, 0);
+          const canvas = canvasRef.current;
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            setError("Canvas context error.");
+            setLoading(false);
+            return;
+          }
 
-            // Extract mask info from segmentation result
-            const maskData = segmentation[0].mask;
-            const maskWidth = segmentation[0].width;
-            const maskHeight = segmentation[0].height;
+          ctx.drawImage(img, 0, 0);
 
-            // Get image data to modify alpha channel
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
+          const mask = segmentation[0].mask;
+          const maskWidth = segmentation[0].width;
+          const maskHeight = segmentation[0].height;
 
-            // Resize or scale mask to image size if necessary
-            // (Assuming mask and image sizes are equal here; if not, you may need to scale)
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
 
-            // Apply mask: make background pixels transparent
-            for (let y = 0; y < maskHeight; y++) {
-              for (let x = 0; x < maskWidth; x++) {
-                const maskIndex = y * maskWidth + x;
-                const alphaIndex = (y * canvas.width + x) * 4 + 3;
+          // Scale mask to canvas size, make background transparent
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+              const maskX = Math.floor((x / canvas.width) * maskWidth);
+              const maskY = Math.floor((y / canvas.height) * maskHeight);
+              const maskIndex = maskY * maskWidth + maskX;
+              const alphaIndex = (y * canvas.width + x) * 4 + 3;
 
-                // If mask pixel is background (0), set alpha to 0 (transparent)
-                // If mask pixel is foreground (1), keep alpha 255 (opaque)
-                if (maskData[maskIndex] < 0.5) {
-                  data[alphaIndex] = 0;
-                }
+              if (mask[maskIndex] < 0.5) {
+                data[alphaIndex] = 0; // transparent pixel
               }
             }
+          }
 
-            ctx.putImageData(imageData, 0, 0);
+          ctx.putImageData(imageData, 0, 0);
 
-            // Convert canvas to image URL
-            const outputUrl = canvas.toDataURL("image/png");
-            setResultUrl(outputUrl);
-            setLoading(false);
-          };
+          const resultURL = canvas.toDataURL("image/png");
+          setResultImage(resultURL);
+        } catch (e) {
+          console.error("Segmentation failed:", e);
+          setError("Background removal failed.");
         }
+        setLoading(false);
       };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      console.error("Error removing background:", error);
-      setLoading(false);
-    }
-  };
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
-      removeBackground(e.target.files[0]);
-    }
+      img.onerror = () => {
+        setError("Failed to load the image.");
+        setLoading(false);
+      };
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return (
-    <div>
-      <h1>Background Remover with Hugging Face RMBG-1.4</h1>
-      <input type="file" accept="image/*" onChange={onFileChange} />
-      {loading && <p>Removing background...</p>}
-      {resultUrl && (
-        <div>
-          <h2>Result</h2>
-          <img src={resultUrl} alt="Result" style={{ maxWidth: "400px" }} />
-          <canvas ref={canvasRef} style={{ display: "none" }} />
+    <div className="max-w-lg mx-auto p-6 bg-white rounded shadow text-center">
+      <label className="block mb-4 cursor-pointer text-gray-700 font-medium">
+        Select an image to remove background:
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="mt-2 block w-full text-sm file:py-2 file:px-4 file:border file:rounded file:border-gray-300 file:text-gray-700 hover:file:bg-gray-100"
+        />
+      </label>
+
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+
+      {loading && <p className="text-blue-600">Removing background...</p>}
+      {error && <p className="text-red-600 mt-2">{error}</p>}
+
+      {resultImage && (
+        <div className="mt-4">
+          <p className="font-semibold mb-2">Result:</p>
+          <img src={resultImage} alt="Background removed" className="rounded shadow max-w-full h-auto mx-auto" />
         </div>
       )}
     </div>
