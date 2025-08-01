@@ -4,10 +4,9 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
-// Lazy-load HowTo (optional: remove `dynamic()` if you prefer SSR)
+// Lazy-load HowTo and DropZone components
 const HowTo = dynamic(() => import("@/components/HowTo"), { ssr: false });
 
-// Fallback DropZone loading state
 function LoadingDropZone() {
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -35,7 +34,6 @@ function LoadingDropZone() {
   );
 }
 
-// Dynamically load DropZone component without SSR
 const DropZone = dynamic(() => import("@/components/DropZone"), {
   ssr: false,
   loading: () => <LoadingDropZone />,
@@ -49,24 +47,18 @@ export default function BackgroundRemoverPage() {
   useEffect(() => {
     setMounted(true);
 
-    // Feature detection for WebGL
-    let gl = null;
+    // WebGL check
     try {
       const canvas = document.createElement("canvas");
-      gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    } catch (err) {
-      console.warn("Error checking WebGL support:", err);
-    }
-
-    if (!gl) {
-      console.warn("WebGL not supported — this browser may not work.");
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      if (!gl) setIsBrowserSupported(false);
+    } catch {
       setIsBrowserSupported(false);
     }
 
-    // Optional: WebGPU info
-    const hasWebGPU = "gpu" in navigator;
-    if (!hasWebGPU) {
-      console.info("WebGPU not available — falling back to CPU if possible.");
+    // Optional WebGPU check
+    if (!("gpu" in navigator)) {
+      console.info("WebGPU not available — fallback to CPU if possible.");
     }
 
     // Load Google AdSense
@@ -163,7 +155,7 @@ export default function BackgroundRemoverPage() {
           )}
         </div>
 
-        {/* HowTo */}
+        {/* HowTo Section */}
         <div
           className={`${
             currentTheme === "light"
