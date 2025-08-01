@@ -1,4 +1,3 @@
-// next.config.js
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -42,6 +41,7 @@ const nextConfig = {
     ];
   },
   webpack: (config, { isServer }) => {
+    // Adding alias and fallback to handle specific cases
     config.resolve = {
       ...config.resolve,
       alias: {
@@ -62,6 +62,13 @@ const nextConfig = {
       config.externals.push('sharp');
     }
 
+    // Adding rule for .node files to use node-loader
+    config.module.rules.push({
+      test: /\.node$/,
+      use: 'node-loader',
+    });
+
+    // Mark JavaScript files as automatically handled
     config.module.rules.push({
       test: /\.m?js$/,
       type: 'javascript/auto',
@@ -70,6 +77,7 @@ const nextConfig = {
       },
     });
 
+    // Enabling experimental features
     config.experiments = {
       asyncWebAssembly: true,
       layers: true,
