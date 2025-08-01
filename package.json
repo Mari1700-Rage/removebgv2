@@ -57,5 +57,5 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev"
   }
-}
+
 }
