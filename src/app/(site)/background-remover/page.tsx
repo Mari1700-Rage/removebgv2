@@ -13,7 +13,7 @@ export default function BackgroundRemoverPage() {
   useEffect(() => {
     (async () => {
       try {
-        const { pipeline } = await import("@huggingface/transformers");
+        const { pipeline } = await import("@xenova/transformers");
         const bgRemoval = await pipeline("image-segmentation", "briaai/RMBG-1.4");
         setPipeline(() => bgRemoval);
       } catch (e) {
