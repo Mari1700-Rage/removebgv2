@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useRef } from "react";
-import * as ort from "onnxruntime-web";
+import { pipeline } from "@huggingface/transformers";
 
 export default function DropZone() {
   const [loading, setLoading] = useState(false);
@@ -9,121 +9,98 @@ export default function DropZone() {
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const handleFileDrop = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      setError(null);
-      setResultImage(null);
-      const file = event.target.files?.[0];
+  // Cache pipeline so you don’t reload each time
+  const bgRemovalPipelineRef = useRef<any>(null);
 
-      if (!file || !file.type.startsWith("image/")) {
-        setError("Please upload a valid image file.");
-        return;
+  const handleFileDrop = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    setResultImage(null);
+    const file = event.target.files?.[0];
+    if (!file || !file.type.startsWith("image/")) {
+      setError("Please upload a valid image file.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      if (!bgRemovalPipelineRef.current) {
+        bgRemovalPipelineRef.current = await pipeline("image-segmentation", "briaai/RMBG-1.4");
       }
+      const bgRemoval = bgRemovalPipelineRef.current;
 
-      const img = new Image();
-      const imgURL = URL.createObjectURL(file);
-      img.src = imgURL;
-
-      img.onload = async () => {
-        setLoading(true);
-        const canvas = canvasRef.current;
-        if (!canvas) {
-          setError("Canvas not available.");
-          return;
-        }
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          setError("Canvas context not found.");
-          return;
-        }
-
-        const originalWidth = img.width;
-        const originalHeight = img.height;
-
-        canvas.width = 224;
-        canvas.height = 224;
-        ctx.drawImage(img, 0, 0, 224, 224);
-
-        const imageData = ctx.getImageData(0, 0, 224, 224).data;
-        const floatArray = new Float32Array(224 * 224 * 3);
-        for (let i = 0; i < 224 * 224; i++) {
-          floatArray[i * 3 + 0] = imageData[i * 4 + 0] / 255;
-          floatArray[i * 3 + 1] = imageData[i * 4 + 1] / 255;
-          floatArray[i * 3 + 2] = imageData[i * 4 + 2] / 255;
-        }
-
-        try {
-          const session = await ort.InferenceSession.create("/model.onnx");
-          console.log("ONNX model loaded:", session);
-
-          const inputName = session.inputNames?.[0];
-          const outputName = session.outputNames?.[0];
-
-          console.log("Input name:", inputName);
-          console.log("Output name:", outputName);
-
-          if (typeof inputName !== "string" || typeof outputName !== "string") {
-            throw new Error("Invalid model I/O names.");
-          }
-
-          const inputTensor = new ort.Tensor("float32", floatArray, [1, 3, 224, 224]);
-          const feeds = { [inputName]: inputTensor };
-
-          const output = await session.run(feeds);
-          console.log("ONNX output:", output);
-
-          const mask = output[outputName].data as Float32Array;
-
-          const outputCanvas = document.createElement("canvas");
-          outputCanvas.width = originalWidth;
-          outputCanvas.height = originalHeight;
-
-          const outputCtx = outputCanvas.getContext("2d");
-          if (!outputCtx) throw new Error("Output canvas context error.");
-
-          const maskCanvas = document.createElement("canvas");
-          maskCanvas.width = 224;
-          maskCanvas.height = 224;
-
-          const maskCtx = maskCanvas.getContext("2d");
-          if (!maskCtx) throw new Error("Mask canvas context error.");
-
-          const maskImage = maskCtx.createImageData(224, 224);
-          for (let i = 0; i < mask.length; i++) {
-            maskImage.data[i * 4 + 0] = imageData[i * 4 + 0];
-            maskImage.data[i * 4 + 1] = imageData[i * 4 + 1];
-            maskImage.data[i * 4 + 2] = imageData[i * 4 + 2];
-            maskImage.data[i * 4 + 3] = Math.floor(mask[i] * 255);
-          }
-
-          maskCtx.putImageData(maskImage, 0, 0);
-          outputCtx.drawImage(maskCanvas, 0, 0, originalWidth, originalHeight);
-
-          outputCanvas.toBlob((blob) => {
-            if (blob) {
-              const resultURL = URL.createObjectURL(blob);
-              setResultImage(resultURL);
-              console.log("Result image URL:", resultURL);
-            }
-            setLoading(false);
-            URL.revokeObjectURL(imgURL);
-          });
-        } catch (e) {
-          console.error("Processing error:", e);
-          setError("Failed to load or run ONNX model.");
+      const reader = new FileReader();
+      reader.onload = async () => {
+        if (typeof reader.result !== "string") {
+          setError("Failed to read image file.");
           setLoading(false);
+          return;
         }
-      };
 
-      img.onerror = () => {
-        setError("Could not load the image.");
-        setLoading(false);
-        URL.revokeObjectURL(imgURL);
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // Avoid CORS issues
+        img.src = reader.result;
+
+        img.onload = async () => {
+          const segmentation = await bgRemoval(reader.result);
+          if (!canvasRef.current) {
+            setError("Canvas not available.");
+            setLoading(false);
+            return;
+          }
+          const canvas = canvasRef.current;
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            setError("Canvas context not found.");
+            setLoading(false);
+            return;
+          }
+          ctx.drawImage(img, 0, 0);
+
+          // segmentation[0] expected shape: { mask, width, height }
+          const mask = segmentation[0].mask;
+          const maskWidth = segmentation[0].width;
+          const maskHeight = segmentation[0].height;
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          // If mask dimensions differ from canvas, you’ll want to scale mask accordingly.
+          // Here we assume they match or scale mask pixel coordinates proportionally:
+
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+              const maskX = Math.floor((x / canvas.width) * maskWidth);
+              const maskY = Math.floor((y / canvas.height) * maskHeight);
+              const maskIndex = maskY * maskWidth + maskX;
+              const alphaIndex = (y * canvas.width + x) * 4 + 3;
+
+              if (mask[maskIndex] < 0.5) {
+                data[alphaIndex] = 0; // transparent pixel
+              }
+            }
+          }
+
+          ctx.putImageData(imageData, 0, 0);
+
+          const outputUrl = canvas.toDataURL("image/png");
+          setResultImage(outputUrl);
+          setLoading(false);
+        };
+
+        img.onerror = () => {
+          setError("Failed to load image.");
+          setLoading(false);
+        };
       };
-    },
-    []
-  );
+      reader.readAsDataURL(file);
+    } catch (e) {
+      console.error("Error:", e);
+      setError("Background removal failed.");
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <div className="w-full max-w-lg mx-auto text-center p-6 border border-gray-200 rounded-lg bg-white shadow">
@@ -137,7 +114,7 @@ export default function DropZone() {
         />
       </label>
 
-      <canvas ref={canvasRef} width={224} height={224} style={{ display: "none" }} />
+      <canvas ref={canvasRef} style={{ display: "none" }} />
 
       {loading && <p className="text-blue-500">Removing background...</p>}
       {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -145,11 +122,7 @@ export default function DropZone() {
       {resultImage && (
         <div className="mt-4">
           <p className="font-semibold mb-2">Result:</p>
-          <img
-            src={resultImage}
-            alt="Processed"
-            className="rounded shadow max-w-full h-auto mx-auto"
-          />
+          <img src={resultImage} alt="Processed" className="rounded shadow max-w-full h-auto mx-auto" />
         </div>
       )}
     </div>
