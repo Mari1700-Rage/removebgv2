@@ -1,6 +1,5 @@
 export const runtime = "edge";
 
-
 import { NextRequest, NextResponse } from "next/server";
 import { pipeline } from "@xenova/transformers";
 
@@ -11,12 +10,17 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file");
 
-    if (!(file instanceof Blob)) {
+    if (!(file instanceof Blob) || file.size === 0) {
       return NextResponse.json({ error: "Invalid or missing image file" }, { status: 400 });
     }
 
     if (!segmenter) {
-      segmenter = await pipeline("image-segmentation", "briaai/RMBG-1.4");
+      try {
+        segmenter = await pipeline("image-segmentation", "briaai/RMBG-1.4");
+      } catch (initError) {
+        console.error("Failed to initialize segmenter:", initError);
+        return NextResponse.json({ error: "Failed to initialize image segmentation model" }, { status: 500 });
+      }
     }
 
     // Run the segmentation pipeline on the image file (Blob)
