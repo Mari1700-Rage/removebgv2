@@ -1,16 +1,9 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import { pipeline } from "@xenova/transformers";
 
-export const runtime = "nodejs";
-
 let segmenter: any = null;
-
-async function getSegmenter() {
-  if (!segmenter) {
-    segmenter = await pipeline("image-segmentation", "briaai/RMBG-1.4");
-  }
-  return segmenter;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,23 +14,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid or missing image file" }, { status: 400 });
     }
 
-    const segmenter = await getSegmenter();
+    if (!segmenter) {
+      try {
+        segmenter = await pipeline("image-segmentation", "briaai/RMBG-1.4");
+      } catch (initError) {
+        console.error("Failed to initialize segmenter:", initError);
+        return NextResponse.json({ error: "Failed to initialize image segmentation model" }, { status: 500 });
+      }
+    }
 
+    // Run the segmentation pipeline on the image file (Blob)
     const results = await segmenter(file);
 
+    // Get alpha-masked image as Blob
     const alphaMaskedImage = await results[0].blob();
 
     return new NextResponse(alphaMaskedImage, {
       headers: { "Content-Type": "image/png" },
     });
   } catch (err) {
-    console.error("Background removal error:", err);
+    console.error("Error during background removal:", err);
     return NextResponse.json({ error: "Failed to process image" }, { status: 500 });
   }
-  "scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start"
-}
-
 }
