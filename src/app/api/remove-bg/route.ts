@@ -34,4 +34,10 @@ export async function POST(req: NextRequest) {
     console.error("Background removal error:", err);
     return NextResponse.json({ error: "Failed to process image" }, { status: 500 });
   }
+  "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
+}
+
 }
