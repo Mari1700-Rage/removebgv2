@@ -1,7 +1,13 @@
 {
   "build": {
     "env": {
-      "TRANSFORMERS_CACHE": "/tmp"
+      "TRANSFORMERS_CACHE": "/tmp/transformers"
+    }
+  },
+  "functions": {
+    "api/remove-bg.ts": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 30
     }
   }
 }
