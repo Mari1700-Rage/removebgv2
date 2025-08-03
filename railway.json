@@ -1,9 +1,9 @@
 {
   "build": {
-    "command": "yarn build"
+    "command": "npm run build"
   },
   "start": {
-    "command": "yarn start"
+    "command": "npm start"
   },
   "plugins": [],
   "deploy": {
