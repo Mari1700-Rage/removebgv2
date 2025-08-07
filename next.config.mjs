@@ -7,15 +7,15 @@ const __dirname = path.dirname(__filename);
 
 const securityHeaders = [
   {
-    key: 'Content-Security-Policy',
+  key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      "script-src 'self' 'unsafe-eval'https://ep2.adtrafficquality.google https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://eraseto.com https://ep1.adtrafficquality.google https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gda&tv=r20250728&st=env 'unsafe-inline';",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-      "img-src 'self' data: blob: https://ep2.adtrafficquality.google https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net;",
-      "connect-src 'self' https://ep2.adtrafficquality.google https://huggingface.co https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gda&tv=r20250728&st=env;",
+      "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
+      "connect-src 'self' https://eraseto.com https://huggingface.co https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
       "font-src 'self' https://fonts.gstatic.com;",
-      "frame-src https://ep2.adtrafficquality.google https://www.google.com https://eraseto.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;",
+      "frame-src https://eraseto.com https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
       "object-src 'none';",
       "base-uri 'self';",
       "form-action 'self';"
