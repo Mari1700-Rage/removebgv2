@@ -6,6 +6,11 @@ import { LuPlus, LuMinus } from "react-icons/lu";
 import Script from "next/script";
 import { useTheme } from "next-themes";
 
+declare global {
+  interface Window {
+    adsbygoogle: any[];
+  }
+}
 export default function FAQsPage() {
     const [openFaq, setOpenFaq] = useState<number | null>(0);
     const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
