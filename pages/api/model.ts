@@ -18,5 +18,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch model' });
-  }
+  } 
 }
