@@ -56,7 +56,7 @@ export default function RowActions({ rowId }: Props) {
                 </ButtonAria>
                 <Popover placement='bottom right' className="origin-top-left overflow-auto rounded-lg border border-accent bg-foreground/50 p-1 shadow-lg ring-1 ring-accent/5 backdrop-blur-md fill-mode-forwards entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95">
                     <Menu className="outline-none">
-                        <ActionItem id="open" onAction={() => router.push(`/background-remover/${rowId}?${searchParams.toString()}`, { scroll: false })}>
+                        <ActionItem id="open" onAction={() => router.push(`/background-remover/${rowId}?${searchParams?.toString() ?? ''}`, { scroll: false })}>
                             <div className="flex items-center gap-2">
                                 <LuArrowRight className="size-4" />
                                 <span>Open</span>
@@ -82,103 +82,4 @@ export default function RowActions({ rowId }: Props) {
                 onOpenChange={setOpen}
                 isDismissable
                 className={({ isEntering, isExiting }) => `
-                fixed inset-0 z-50 overflow-y-auto bg-background/25 flex min-h-full items-center justify-center p-4 text-center backdrop-blur
-                ${isEntering ? 'animate-in fade-in duration-300 ease-out' : ''}
-                ${isExiting ? 'animate-out fade-out duration-200 ease-in' : ''}
-                `}
-            >
-                <Modal
-                    className={({ isEntering, isExiting }) => `
-                w-full max-w-md md:max-w-screen-lg overflow-hidden rounded-2xl bg-foreground p-6 text-left align-middle shadow-xl
-                ${isEntering ? 'animate-in zoom-in-95 ease-out duration-300' : ''}
-                ${isExiting ? 'animate-out zoom-out-95 ease-in duration-200' : ''}
-                `}
-                >
-                    <Dialog role="dialog" aria-label={name} className="relative outline-none">
-                        {({ close }) => (
-                            <>
-                                <div className="flex gap-3">
-                                    <TransformWrapper>
-                                        {({ zoomIn, zoomOut, resetTransform }) => (
-                                            <div>
-                                                <TransformComponent wrapperClass="border border-x border-t rounded-t-lg border border-accent">
-                                                    <NextImage
-                                                        src={imageUrl}
-                                                        alt={name}
-                                                        width={width}
-                                                        height={height}
-                                                        className="object-contain"
-                                                    />
-                                                </TransformComponent>
-                                                <div className="flex items-center justify-center gap-2 border border-x border-b rounded-b-lg border-accent p-2">
-                                                    <ButtonAria
-                                                        onPress={() => zoomIn()}
-                                                        className="inline-flex items-center justify-center rounded-md border border-accent bg-foreground px-2 py-1 text-sm text-primary focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:text-primary/50 disabled:opacity-50"
-                                                    >
-                                                        <LuZoomIn className="size-4" />
-                                                    </ButtonAria>
-                                                    <ButtonAria
-                                                        onPress={() => zoomOut()}
-                                                        className="inline-flex items-center justify-center rounded-md border border-accent bg-foreground px-2 py-1 text-sm text-primary focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:text-primary/50 disabled:opacity-50"
-                                                    >
-                                                        <LuZoomOut className="size-4" />
-                                                    </ButtonAria>
-                                                    <ButtonAria
-                                                        onPress={() => resetTransform()}
-                                                        className="inline-flex items-center justify-center rounded-md border border-accent bg-foreground px-2 py-1 text-sm text-primary focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:text-primary/50 disabled:opacity-50"
-                                                    >
-                                                        <LuRefreshCcw className="size-4" />
-                                                    </ButtonAria>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </TransformWrapper>
-                                    <TransformWrapper>
-                                        {({ zoomIn, zoomOut, resetTransform }) => (
-                                            <div>
-                                                <TransformComponent wrapperClass="border border-x border-t rounded-t-lg border border-accent">
-                                                    <NextImage
-                                                        src={transformedImageUrl}
-                                                        alt={name}
-                                                        width={width}
-                                                        height={height}
-                                                        className="object-contain"
-                                                    />
-                                                </TransformComponent>
-                                                <div className="flex items-center justify-center gap-2 border border-x border-b rounded-b-lg border-accent p-2">
-                                                    <ButtonAria
-                                                        onPress={() => zoomIn()}
-                                                        className="inline-flex items-center justify-center rounded-md border border-accent bg-foreground px-2 py-1 text-sm text-primary focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:text-primary/50 disabled:opacity-50"
-                                                    >
-                                                        <LuZoomIn className="size-4" />
-                                                    </ButtonAria>
-                                                    <ButtonAria
-                                                        onPress={() => zoomOut()}
-                                                        className="inline-flex items-center justify-center rounded-md border border-accent bg-foreground px-2 py-1 text-sm text-primary focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:text-primary/50 disabled:opacity-50"
-                                                    >
-                                                        <LuZoomOut className="size-4" />
-                                                    </ButtonAria>
-                                                    <ButtonAria
-                                                        onPress={() => resetTransform()}
-                                                        className="inline-flex items-center justify-center rounded-md border border-accent bg-foreground px-2 py-1 text-sm text-primary focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:text-primary/50 disabled:opacity-50"
-                                                    >
-                                                        <LuRefreshCcw className="size-4" />
-                                                    </ButtonAria>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </TransformWrapper>
-                                </div>
-                                <ButtonAria
-                                    onPress={close}
-                                    className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-background/50 text-primary hover:bg-background/70">
-                                    &#x2715;
-                                </ButtonAria>
-                            </>
-                        )}
-                    </Dialog>
-                </Modal>
-            </ModalOverlay>
-        </>
-    )
-}
+                fixed inset-0 z-50 overflow-y-auto bg-background/25 flex min-h-full items-center justify-center p-4 te
