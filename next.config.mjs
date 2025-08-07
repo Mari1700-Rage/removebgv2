@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import webpack from 'webpack'; // ✅ Use official webpack package
+import webpack from 'webpack/webpack-lib.js'; // ✅ Use official webpack package
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
