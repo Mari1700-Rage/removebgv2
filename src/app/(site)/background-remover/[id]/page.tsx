@@ -5,18 +5,17 @@ export const metadata: Metadata = {
   description: "View and edit your processed image",
 };
 
-// Make this async to satisfy Next.js typing
 export async function generateStaticParams() {
   return [{ id: "placeholder" }];
 }
 
 interface Props {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 }
 
-export default function Page({ params: { id } }: Props) {
+export default async function Page({ params }: Props) {
+  const { id } = await params;  // Await because params is a Promise
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Image Details</h1>
@@ -24,4 +23,3 @@ export default function Page({ params: { id } }: Props) {
     </div>
   );
 }
-
