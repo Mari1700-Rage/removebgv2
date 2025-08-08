@@ -5,7 +5,8 @@ export const metadata: Metadata = {
   description: "View and edit your processed image",
 };
 
-export function generateStaticParams() {
+// Make this async to satisfy Next.js typing
+export async function generateStaticParams() {
   return [{ id: "placeholder" }];
 }
 
@@ -22,4 +23,5 @@ export default function Page({ params: { id } }: Props) {
       <p>This page will be populated with client-side data for ID: {id}</p>
     </div>
   );
-} 
+}
+
