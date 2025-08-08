@@ -1,7 +1,9 @@
-"use client"
+"use client";
 
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
 
 type BackgroundImage = {
   id: string;
@@ -29,7 +31,7 @@ const backgroundImages: BackgroundImage[] = [
   { id: "17", src: "/background/17-min.jpg", alt: "Background 17" },
 ];
 
-// Number of items to show in each page of the carousel
+// Number of items per page
 const ITEMS_PER_PAGE = 5;
 
 interface BackgroundSelectorProps {
@@ -45,42 +47,56 @@ export default function BackgroundSelector({
 }: BackgroundSelectorProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  
+  const [customBackgroundUrl, setCustomBackgroundUrl] = useState<string | null>(null);
+
   const totalPages = Math.ceil(backgroundImages.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
-    // Preload background images
+    // Preload first 6 background images
     Promise.all(
       backgroundImages.slice(0, 6).map((img) => {
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
           const image = new Image();
           image.src = img.src;
-          image.onload = resolve;
-          image.onerror = resolve; // Still resolve on error to avoid hanging
+          image.onload = () => resolve();
+          image.onerror = () => resolve();
         });
       })
-    ).then(() => {
-      setIsLoaded(true);
-    });
+    ).then(() => setIsLoaded(true));
   }, []);
+
+  // Handle file uploads for custom background
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (acceptedFiles.length === 0) return;
+
+      const file = acceptedFiles[0];
+      const objectUrl = URL.createObjectURL(file);
+
+      setCustomBackgroundUrl(objectUrl);
+      onSelectBackground(objectUrl);
+
+      // Optional: you can revoke the object URL later when no longer needed
+      // For example, when user selects a different background or on component unmount
+    },
+    [onSelectBackground]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "image/*": [".png", ".jpg", ".jpeg"] },
+  });
 
   const handleBackgroundSelect = useCallback(
     (bg: string | null) => {
+      setCustomBackgroundUrl(null); // clear custom background if selecting preset or none
       onSelectBackground(bg);
     },
     [onSelectBackground]
   );
 
-  const goToNextPage = () => {
-    setCurrentPage((prev) => (prev === totalPages - 1 ? 0 : prev + 1));
-  };
-
-  const goToPrevPage = () => {
-    setCurrentPage((prev) => (prev === 0 ? totalPages - 1 : prev - 1));
-  };
-
-  // Calculate which images to display based on current page
-  const displayedImages = [...backgroundImages].slice(
+  // Images to display on current page
+  const displayedImages = backgroundImages.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
   );
@@ -88,9 +104,7 @@ export default function BackgroundSelector({
   return (
     <div className="w-full">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700">
-          Background Images
-        </h3>
+        <h3 className="text-sm font-medium text-gray-700">Background Images</h3>
         <div className="flex items-center gap-2">
           {rightElement ? (
             rightElement
@@ -102,7 +116,11 @@ export default function BackgroundSelector({
               <div className="flex gap-1">
                 <button
                   type="button"
-                  onClick={goToPrevPage}
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      prev === 0 ? totalPages - 1 : prev - 1
+                    )
+                  }
                   className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                   aria-label="Previous page"
                 >
@@ -120,7 +138,11 @@ export default function BackgroundSelector({
                 </button>
                 <button
                   type="button"
-                  onClick={goToNextPage}
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      prev === totalPages - 1 ? 0 : prev + 1
+                    )
+                  }
                   className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                   aria-label="Next page"
                 >
@@ -200,8 +222,43 @@ export default function BackgroundSelector({
               )}
             </button>
           ))}
+
+          {/* Custom uploaded background preview */}
+          {customBackgroundUrl && (
+            <button
+              onClick={() => onSelectBackground(customBackgroundUrl)}
+              className={cn(
+                "aspect-square rounded-lg p-0.5 transition-all overflow-hidden relative",
+                selectedBackground === customBackgroundUrl
+                  ? "ring-2 ring-[#6C5CE7] ring-offset-2"
+                  : "ring-1 ring-gray-200 hover:ring-[#6C5CE7]/50"
+              )}
+              aria-label="Custom Background"
+            >
+              <img
+                src={customBackgroundUrl}
+                alt="Custom Background"
+                className="h-full w-full object-cover rounded-md"
+              />
+              {selectedBackground === customBackgroundUrl && (
+                <div className="absolute -right-1 -top-1 size-3 rounded-full bg-[#6C5CE7] ring-2 ring-white shadow-md">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="size-full p-0.5"
+                  >
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              )}
+            </button>
+          )}
         </div>
-        
+
         {/* Carousel Indicators */}
         <div className="mt-4 flex justify-center gap-1.5">
           {Array.from({ length: totalPages }).map((_, index) => (
@@ -218,7 +275,20 @@ export default function BackgroundSelector({
             />
           ))}
         </div>
+
+        {/* Upload custom background dropzone */}
+        <div
+          {...getRootProps()}
+          className="mt-4 border-2 border-dashed rounded p-4 text-center cursor-pointer"
+        >
+          <input {...getInputProps()} />
+          <p>
+            {isDragActive
+              ? "Drop your custom background here..."
+              : "Upload a custom background image"}
+          </p>
+        </div>
       </div>
     </div>
   );
-} 
+}
