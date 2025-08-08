@@ -1,0 +1,9 @@
+{
+  "app\\(site)\\background-remover\\page.tsx -> @/components/DropZone": {
+    "id": "app\\(site)\\background-remover\\page.tsx -> @/components/DropZone",
+    "files": [
+      "static/css/_app-pages-browser_src_components_DropZone_tsx.css",
+      "static/chunks/_app-pages-browser_src_components_DropZone_tsx.js"
+    ]
+  }
+}
