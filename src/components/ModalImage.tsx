@@ -24,7 +24,7 @@ export function ModalImage({ rowId }: Props) {
     const width = useCell("images", rowId, "width")
 
     const downloadPNG = async () => {
-        const filename = name.replace(/\.(png|jpg|jpeg|gif)$/i, '')
+        const filename = String(name || '').replace(/\.(png|jpg|jpeg|gif)$/i, '');
         const img = await new Promise<HTMLImageElement>((resolve) => {
             const image = new Image()
             image.src = transformedImageUrl || imageUrl
