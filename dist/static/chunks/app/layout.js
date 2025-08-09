@@ -5,7 +5,7 @@
  * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
+ */ 
 (self["webpackChunk_N_E"] = self["webpackChunk_N_E"] || []).push([["app/layout"],{
 
 /***/ "(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CMy-Projects%5C%5CBackground%20remover%20V2%5C%5Cremover%5C%5Cnode_modules%5C%5Cnext%5C%5Cdist%5C%5Cclient%5C%5Cscript.js%22%2C%22ids%22%3A%5B%22*%22%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CMy-Projects%5C%5CBackground%20remover%20V2%5C%5Cremover%5C%5Cnode_modules%5C%5Cnext%5C%5Cfont%5C%5Clocal%5C%5Ctarget.css%3F%7B%5C%22path%5C%22%3A%5C%22node_modules%5C%5C%5C%5Cgeist%5C%5C%5C%5Cdist%5C%5C%5C%5Csans.js%5C%22%2C%5C%22import%5C%22%3A%5C%22%5C%22%2C%5C%22arguments%5C%22%3A%5B%7B%5C%22src%5C%22%3A%5C%22.%2Ffonts%2Fgeist-sans%2FGeist-Variable.woff2%5C%22%2C%5C%22variable%5C%22%3A%5C%22--font-geist-sans%5C%22%2C%5C%22weight%5C%22%3A%5C%22100%20900%5C%22%7D%5D%2C%5C%22variableName%5C%22%3A%5C%22GeistSans%5C%22%7D%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CMy-Projects%5C%5CBackground%20remover%20V2%5C%5Cremover%5C%5Csrc%5C%5Capp%5C%5Cglobals.css%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CMy-Projects%5C%5CBackground%20remover%20V2%5C%5Cremover%5C%5Csrc%5C%5Capp%5C%5CProviders.tsx%22%2C%22ids%22%3A%5B%22default%22%5D%7D&server=false!":
