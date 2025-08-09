@@ -10,12 +10,12 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.google.com https://*.gstatic.com;",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.google.com https://*.gstatic.com;", // Added Google domains for scripts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-      "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.gstatic.com https://*.googleusercontent.com;",
-      "connect-src 'self' https://huggingface.co https://api.example.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.google.com;",
+      "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.gstatic.com https://*.googleusercontent.com;", // Added Google image domains
+      "connect-src 'self' https://huggingface.co https://api.example.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.google.com;", // Allowed connections to Google services
       "font-src 'self' https://fonts.gstatic.com;",
-      "frame-src 'self' https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.youtube.com;",
+      "frame-src 'self' https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.youtube.com;", // Allowed Google and YouTube frames
       "object-src 'none';",
       "base-uri 'self';",
       "form-action 'self';"
@@ -45,24 +45,23 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['eraseto.com', 'googleusercontent.com'], // Relaxed to allow Google's domains
+    domains: ['eraseto.com', 'googleusercontent.com', 'googleads.g.doubleclick.net'], // Relaxed for external Google resources
   },
   async headers() {
     return [
       {
-        source: '/(.*)',
-        headers: securityHeaders, // Using the relaxed CSP settings
+        source: '/(.*)', // Apply the headers to all routes
+        headers: securityHeaders, // Apply the relaxed CSP and security headers
       },
     ];
   },
   webpack: (config, { isServer }) => {
-    // Removed devtool override to avoid errors
-
+    // Webpack configuration to avoid errors
     config.resolve = {
       ...config.resolve,
       alias: {
         ...config.resolve.alias,
-        sharp$: false,
+        sharp$: false, // Disabling sharp dependency
         'onnxruntime-node$': false,
         'onnxruntime-web/dist/ort.node.min.mjs': false,
       },
