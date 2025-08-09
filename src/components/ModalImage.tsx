@@ -10,7 +10,7 @@ import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { toast } from "sonner";
 
 type Props = {
-    rowId: string
+    rowId: string 
 }
 
 export function ModalImage({ rowId }: Props) {
