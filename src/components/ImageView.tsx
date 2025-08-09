@@ -34,9 +34,12 @@ export default function ImageView({ rowId }: Props) {
   // Sanitize filename for Windows-safe download
   const sanitizeFilename = (filename: string) => {
     // Keep alphanumeric, periods, dashes, underscores only
- return typeof filename === 'string' 
-  ? filename.replace(/[^\w.-]/g, '_') 
-  : '';
+const sanitizeFilename = (filename: string) => {
+  return typeof filename === 'string' 
+    ? filename.replace(/[^\w.-]/g, '_') 
+    : '';
+};
+
 
   const downloadPNG = async () => {
     const filename = sanitizeFilename(name.replace(/\.(png|jpg|jpeg|gif)$/i, ''));
