@@ -1,6 +1,0 @@
-{"type": "commonjs"}
-{
-  "scripts": {
-    "start": "node app.js"
-  }
-}
