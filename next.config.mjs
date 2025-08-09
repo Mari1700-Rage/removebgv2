@@ -4,17 +4,18 @@ import webpack from 'next/dist/compiled/webpack/webpack-lib.js'; // ✅ Needed f
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const securityHeaders = [
   {
-    key: 'Content-Security-Policy',
+  key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      "script-src 'self' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
-      "style-src 'self' https://fonts.googleapis.com;", // Remove 'unsafe-inline' if possible
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
       "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
       "connect-src 'self' https://eraseto.com https://huggingface.co https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
       "font-src 'self' https://fonts.gstatic.com;",
-      "frame-src 'self' https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
+      "frame-src https://eraseto.com https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
       "object-src 'none';",
       "base-uri 'self';",
       "form-action 'self';"
@@ -30,14 +31,13 @@ const securityHeaders = [
   },
   {
     key: 'X-Frame-Options',
-    value: 'DENY', // Change to SAMEORIGIN if iframe embedding is needed
+    value: 'DENY',
   },
   {
     key: 'X-XSS-Protection',
-    value: '1; mode=block', // Deprecated in some browsers, still useful in others
+    value: '1; mode=block',
   },
 ];
-
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
