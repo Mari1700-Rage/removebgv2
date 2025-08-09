@@ -7,15 +7,15 @@ const __dirname = path.dirname(__filename);
 
 const securityHeaders = [
   {
-  key: 'Content-Security-Policy',
+    key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://eraseto.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://securepubads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.google.com https://*.gstatic.com;",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-      "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
-      "connect-src 'self' https://eraseto.com https://huggingface.co https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
+      "img-src 'self' data: blob: https://eraseto.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.gstatic.com https://*.googleusercontent.com;",
+      "connect-src 'self' https://huggingface.co https://api.example.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://*.google.com;",
       "font-src 'self' https://fonts.gstatic.com;",
-      "frame-src https://eraseto.com https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google;",
+      "frame-src 'self' https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.youtube.com;",
       "object-src 'none';",
       "base-uri 'self';",
       "form-action 'self';"
@@ -45,13 +45,13 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['eraseto.com'],
+    domains: ['eraseto.com', 'googleusercontent.com'], // Relaxed to allow Google's domains
   },
   async headers() {
     return [
       {
         source: '/(.*)',
-        headers: securityHeaders,
+        headers: securityHeaders, // Using the relaxed CSP settings
       },
     ];
   },
