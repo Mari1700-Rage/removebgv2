@@ -4,11 +4,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import HowTo from "@/components/HowTo";
-declare global {
-  interface Window {
-    adsbygoogle: any[];
-  }
-}
 
 
 // Fallback DropZone loading state
