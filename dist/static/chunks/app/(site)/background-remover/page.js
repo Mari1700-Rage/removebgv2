@@ -6,7 +6,7 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-(self["webpackChunk_N_E"] = self["webpackChunk_N_E"] || []).push([["app/(site)/background-remover/page"],{
+(self["webpackChunk_N_E"] = self["webpackChunk_N_E"] || []).push([["app/(site)/background-remover/page"],{ 
 
 /***/ "(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CMy-Projects%5C%5CBackground%20remover%20V2%5C%5Cremover%5C%5Csrc%5C%5Capp%5C%5C(site)%5C%5Cbackground-remover%5C%5Cpage.tsx%22%2C%22ids%22%3A%5B%5D%7D&server=false!":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
