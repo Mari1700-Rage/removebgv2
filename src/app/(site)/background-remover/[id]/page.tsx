@@ -1,13 +1,14 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+// Make this route dynamically render at request time
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Image Details - AI Background Remover",
   description: "View and edit your processed image",
 };
 
-export function generateStaticParams() {
-  return [{ id: "placeholder" }];
-}
 interface Props {
   params: {
     id: string;
@@ -15,15 +16,15 @@ interface Props {
 }
 
 export default function Page({ params: { id } }: Props) {
-  // Defensive check if needed
-  if (typeof id !== 'string') {
-    throw new Error("Invalid ID");
+  // Defensive check (optional)
+  if (typeof id !== "string" || !id.trim()) {
+    notFound(); // Show 404 page if ID is invalid
   }
 
   return (
-    <div>
-      <h1>Image Details</h1>
-      <p>Client-side data for ID: {id}</p>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4">Image Details</h1>
+      <p>This page is rendered dynamically for ID: {id}</p>
     </div>
   );
 }
