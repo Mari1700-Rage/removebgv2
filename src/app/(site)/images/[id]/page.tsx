@@ -8,18 +8,22 @@ export const metadata: Metadata = {
 export function generateStaticParams() {
   return [{ id: "placeholder" }];
 }
-
 interface Props {
   params: {
     id: string;
   };
 }
 
-export default function page({ params: { id } }: Props) {
+export default function Page({ params: { id } }: Props) {
+  // Defensive check if needed
+  if (typeof id !== 'string') {
+    throw new Error("Invalid ID");
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Image Details</h1>
-      <p>This page will be populated with client-side data for ID: {id}</p>
+    <div>
+      <h1>Image Details</h1>
+      <p>Client-side data for ID: {id}</p>
     </div>
   );
 }
