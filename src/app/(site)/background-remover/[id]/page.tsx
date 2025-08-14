@@ -1,7 +1,9 @@
+// app/background-remover/[id]/page.tsx
+
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-// Make this route dynamically render at request time
+// Ensure this runs at runtime and accepts any id
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -11,15 +13,18 @@ export const metadata: Metadata = {
 
 interface Props {
   params: {
-    id: string;
+    id: string | string[]; // defensive typing
   };
 }
 
-export default function Page({ params: { id } }: Props) {
-  // Defensive check (optional)
-  if (typeof id !== "string" || !id.trim()) {
-    notFound(); // Show 404 page if ID is invalid
+export default function Page({ params }: Props) {
+  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  if (typeof rawId !== "string" || !rawId.trim()) {
+    notFound();
   }
+
+  const id = rawId; // Guaranteed string
 
   return (
     <div className="container mx-auto px-4 py-8">
