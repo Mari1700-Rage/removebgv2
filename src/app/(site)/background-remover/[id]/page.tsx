@@ -1,35 +1,34 @@
-// app/background-remover/[id]/page.tsx
+'use client';
 
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-// Ensure this runs at runtime and accepts any id
-export const dynamic = "force-dynamic";
+export default function ClientPage() {
+  const params = useParams();
+  const [id, setId] = useState<string | null>(null);
 
-export const metadata: Metadata = {
-  title: "Image Details - AI Background Remover",
-  description: "View and edit your processed image",
-};
+  useEffect(() => {
+    if (typeof params?.id === "string") {
+      setId(params.id);
+    } else if (Array.isArray(params?.id)) {
+      setId(params.id[0]); // grab first value if array
+    } else {
+      setId(null);
+    }
+  }, [params]);
 
-interface Props {
-  params: {
-    id: string | string[]; // defensive typing
-  };
-}
-
-export default function Page({ params }: Props) {
-  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
-
-  if (typeof rawId !== "string" || !rawId.trim()) {
-    notFound();
+  if (id === null) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-xl font-semibold">Invalid or missing ID</h1>
+      </div>
+    );
   }
-
-  const id = rawId; // Guaranteed string
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Image Details</h1>
-      <p>This page is rendered dynamically for ID: {id}</p>
+      <h1 className="text-2xl font-bold mb-4">Image Details (Client Only)</h1>
+      <p>This page is rendered entirely on the client for ID: {id}</p>
     </div>
   );
 }
