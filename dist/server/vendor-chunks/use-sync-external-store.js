@@ -11,7 +11,7 @@ exports.id = "vendor-chunks/use-sync-external-store";
 exports.ids = ["vendor-chunks/use-sync-external-store"];
 exports.modules = {
 
-/***/ "(ssr)/./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js":
+/***/ "(ssr)/./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js": 
 /*!**********************************************************************************************!*\
   !*** ./node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js ***!
   \**********************************************************************************************/
