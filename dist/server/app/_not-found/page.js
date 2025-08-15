@@ -7,7 +7,7 @@
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
 (() => {
-var exports = {};
+var exports = {}; 
 exports.id = "app/_not-found/page";
 exports.ids = ["app/_not-found/page"];
 exports.modules = {
