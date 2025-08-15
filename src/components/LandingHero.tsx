@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
-import { LuUpload, LuSparkles, LuImage, LuArrowRight } from "react-icons/lu"
+import { LuUpload, LuSparkles, LuArrowRight } from "react-icons/lu"
 import { useStore } from "@/lib/schema"
 import { cn } from "@/lib/utils"
 
@@ -14,15 +14,21 @@ export function LandingHero() {
   const [hoverUpload, setHoverUpload] = useState(false)
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    storeReference?.transaction(() => {
+    // Ensure we always call store methods with the correct `this`
+    if (!storeReference) return
+
+    storeReference.transaction(function () {
       acceptedFiles.forEach((file) => {
         const reader = new FileReader()
         reader.readAsDataURL(file)
+
         reader.onload = () => {
           const base64String = reader.result as string
           const imgElement = new window.Image()
           imgElement.src = base64String
+
           imgElement.onload = () => {
+            // Call addRow directly from the storeReference
             storeReference.addRow('images', {
               name: file.name,
               size: file.size,
@@ -31,12 +37,13 @@ export function LandingHero() {
               height: imgElement.height,
               width: imgElement.width,
             })
-            // Redirect to background-remover page after successful upload
+
+            // Redirect after successful upload
             router.push('/background-remover')
           }
         }
       })
-    })
+    }.bind(storeReference)) // <-- bind ensures private fields still work
   }, [storeReference, router])
 
   const {
@@ -55,15 +62,12 @@ export function LandingHero() {
   return (
     <section className="w-full py-12 overflow-hidden">
       <div className="max-w-5xl mx-auto px-4">
-        {/* Hero Container with Gradient Background */}
         <div className="relative rounded-2xl overflow-hidden">
-          {/* Background Elements */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1]/5 via-[#8C85FF]/5 to-[#EC4899]/5 z-0"></div>
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#6366F1] to-[#EC4899] z-10"></div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#6366F1]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#EC4899]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-          
-          {/* Decorative Pattern */}
+
           <div className="absolute inset-0 opacity-5 z-0">
             <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -76,7 +80,6 @@ export function LandingHero() {
           </div>
           
           <div className="relative z-10 p-8 md:p-10">
-            {/* Centered Content */}
             <div className="max-w-3xl mx-auto text-center space-y-6">
               <motion.div
                 initial={{ opacity: 0 }}
@@ -107,7 +110,6 @@ export function LandingHero() {
                 <span className="block mt-2 text-sm font-medium">No signup required. No watermarks. Professional quality.</span>
               </motion.p>
               
-              {/* Features List */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -129,7 +131,6 @@ export function LandingHero() {
                 ))}
               </motion.div>
 
-              {/* Main Upload Box */}
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -183,7 +184,6 @@ export function LandingHero() {
                   </div>
                 </div>
 
-                {/* Alternative Upload Button */}
                 <div className="bg-gradient-to-r from-[#6366F1] to-[#EC4899] p-px">
                   <button
                     onClick={() => {
@@ -202,7 +202,6 @@ export function LandingHero() {
                 </div>
               </motion.div>
               
-              {/* Processing Stats */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -228,4 +227,4 @@ export function LandingHero() {
       </div>
     </section>
   )
-} 
+}
