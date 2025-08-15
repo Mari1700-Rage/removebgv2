@@ -7,7 +7,7 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   safelist: [
-    'image_ymZOY',
+    'image_ymZOY', 
     'banner1_OkOk1',
     'banner2_vEFCM',
     'banner3_j1JMk',
