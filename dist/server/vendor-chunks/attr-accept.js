@@ -10,7 +10,7 @@
 exports.id = "vendor-chunks/attr-accept";
 exports.ids = ["vendor-chunks/attr-accept"];
 exports.modules = {
-
+ 
 /***/ "(ssr)/./node_modules/attr-accept/dist/es/index.js":
 /*!***************************************************!*\
   !*** ./node_modules/attr-accept/dist/es/index.js ***!
