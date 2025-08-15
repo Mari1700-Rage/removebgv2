@@ -9,7 +9,7 @@
  */
 exports.id = "vendor-chunks/clsx";
 exports.ids = ["vendor-chunks/clsx"];
-exports.modules = {
+exports.modules = { 
 
 /***/ "(ssr)/./node_modules/clsx/dist/clsx.mjs":
 /*!*****************************************!*\
