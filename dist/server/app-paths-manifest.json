@@ -3,3 +3,4 @@
   "/(site)/page": "app/(site)/page.js",
   "/(site)/background-remover/page": "app/(site)/background-remover/page.js"
 } 
+ 
