@@ -10,7 +10,7 @@
 exports.id = "vendor-chunks/tinybase";
 exports.ids = ["vendor-chunks/tinybase"];
 exports.modules = {
-
+ 
 /***/ "(ssr)/./node_modules/tinybase/lib/tinybase.js":
 /*!***********************************************!*\
   !*** ./node_modules/tinybase/lib/tinybase.js ***!
