@@ -21,7 +21,7 @@ checkFields<Diff<{
   generateMetadata?: Function
   viewport?: any
   generateViewport?: Function
-  
+   
 }, TEntry, ''>>()
 
 // Check the prop type of the entry function
