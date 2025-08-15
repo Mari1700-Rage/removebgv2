@@ -8,7 +8,7 @@
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
 exports.id = "vendor-chunks/@emotion";
-exports.ids = ["vendor-chunks/@emotion"];
+exports.ids = ["vendor-chunks/@emotion"]; 
 exports.modules = {
 
 /***/ "(ssr)/./node_modules/@emotion/is-prop-valid/dist/emotion-is-prop-valid.esm.js":
