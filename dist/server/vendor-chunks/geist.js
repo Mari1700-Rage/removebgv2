@@ -11,7 +11,7 @@ exports.id = "vendor-chunks/geist";
 exports.ids = ["vendor-chunks/geist"];
 exports.modules = {
 
-/***/ "(rsc)/./node_modules/geist/dist/sans.js":
+/***/ "(rsc)/./node_modules/geist/dist/sans.js": 
 /*!*****************************************!*\
   !*** ./node_modules/geist/dist/sans.js ***!
   \*****************************************/
