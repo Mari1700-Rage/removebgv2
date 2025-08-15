@@ -1,7 +1,7 @@
 {
   "name": "eraseto",
   "version": "0.1.0",
-  "private": true,
+  "private": true, 
   "scripts": {
     "dev": "next dev && tsc --noEmit",
     "build": "next build",
