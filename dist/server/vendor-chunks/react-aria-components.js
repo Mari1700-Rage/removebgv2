@@ -9,7 +9,7 @@
  */
 exports.id = "vendor-chunks/react-aria-components";
 exports.ids = ["vendor-chunks/react-aria-components"];
-exports.modules = {
+exports.modules = { 
 
 /***/ "(ssr)/./node_modules/react-aria-components/dist/Autocomplete.mjs":
 /*!******************************************************************!*\
