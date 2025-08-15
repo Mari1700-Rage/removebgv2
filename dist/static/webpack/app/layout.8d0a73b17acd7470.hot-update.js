@@ -11,7 +11,7 @@ self["webpackHotUpdate_N_E"]("app/layout",{
 
 /***/ "(app-pages-browser)/./src/app/globals.css":
 /*!*****************************!*\
-  !*** ./src/app/globals.css ***!
+  !*** ./src/app/globals.css ***! 
   \*****************************/
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
