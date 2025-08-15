@@ -10,7 +10,7 @@ import Document, {
 class MyDocument extends Document<{ nonce?: string }> {
   static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
     const initialProps = await Document.getInitialProps(ctx)
-
+ 
     // Optional: you can try to extract nonce from headers if passed
     return {
       ...initialProps,
