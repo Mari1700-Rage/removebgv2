@@ -8,7 +8,7 @@
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
 exports.id = "vendor-chunks/@internationalized";
-exports.ids = ["vendor-chunks/@internationalized"];
+exports.ids = ["vendor-chunks/@internationalized"]; 
 exports.modules = {
 
 /***/ "(ssr)/./node_modules/@internationalized/number/dist/NumberFormatter.mjs":
