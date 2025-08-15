@@ -9,7 +9,7 @@
  */
 self["webpackHotUpdate_N_E"]("app/layout",{
 
-/***/ "(app-pages-browser)/./src/app/globals.css":
+/***/ "(app-pages-browser)/./src/app/globals.css": 
 /*!*****************************!*\
   !*** ./src/app/globals.css ***!
   \*****************************/
