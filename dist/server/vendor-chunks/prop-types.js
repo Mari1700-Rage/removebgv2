@@ -9,7 +9,7 @@
 exports.id = "vendor-chunks/prop-types";
 exports.ids = ["vendor-chunks/prop-types"];
 exports.modules = {
-
+ 
 /***/ "(ssr)/./node_modules/prop-types/checkPropTypes.js":
 /*!***************************************************!*\
   !*** ./node_modules/prop-types/checkPropTypes.js ***!
