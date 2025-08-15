@@ -13,7 +13,7 @@ exports.modules = {
 
 /***/ "(ssr)/./node_modules/file-selector/dist/es2015/file-selector.js":
 /*!*****************************************************************!*\
-  !*** ./node_modules/file-selector/dist/es2015/file-selector.js ***!
+  !*** ./node_modules/file-selector/dist/es2015/file-selector.js ***! 
   \*****************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
