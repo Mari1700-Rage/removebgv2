@@ -9,7 +9,7 @@
 (() => {
 var exports = {};
 exports.id = "app/(site)/background-remover/page";
-exports.ids = ["app/(site)/background-remover/page"];
+exports.ids = ["app/(site)/background-remover/page"]; 
 exports.modules = {
 
 /***/ "../../client/components/action-async-storage.external":
