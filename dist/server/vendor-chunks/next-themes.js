@@ -11,7 +11,7 @@ exports.id = "vendor-chunks/next-themes";
 exports.ids = ["vendor-chunks/next-themes"];
 exports.modules = {
 
-/***/ "(ssr)/./node_modules/next-themes/dist/index.mjs":
+/***/ "(ssr)/./node_modules/next-themes/dist/index.mjs": 
 /*!*************************************************!*\
   !*** ./node_modules/next-themes/dist/index.mjs ***!
   \*************************************************/
