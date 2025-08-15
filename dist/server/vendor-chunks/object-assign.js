@@ -10,7 +10,7 @@
 exports.id = "vendor-chunks/object-assign";
 exports.ids = ["vendor-chunks/object-assign"];
 exports.modules = {
-
+ 
 /***/ "(ssr)/./node_modules/object-assign/index.js":
 /*!*********************************************!*\
   !*** ./node_modules/object-assign/index.js ***!
