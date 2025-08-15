@@ -13,7 +13,7 @@ exports.modules = {
 
 /***/ "(ssr)/./node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs":
 /*!*********************************************************************************!*\
-  !*** ./node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs ***!
+  !*** ./node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs ***! 
   \*********************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
