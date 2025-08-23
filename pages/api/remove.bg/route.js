@@ -18,7 +18,7 @@ export const POST = async (req) => {
     const response = await fetch("https://api.remove.bg/v1.0/removebg", {
       method: "POST",
       headers: {
-        "X-Api-Key": privateEnv.REMOVE_BG_API_KEY,
+        "X-Api-Key": VAYHxW4RdSZTJhEhtT1fN38XY,
       },
       body: formData,
     });
